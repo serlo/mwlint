@@ -4,3 +4,6 @@ version = "0.1.0"
 authors = ["Valentin Roland <valentin@vroland.de>"]
 
 [dependencies]
+mediawiki_parser = { git = "https://github.com/vroland/mediawiki-peg-rust.git" }
+serde = "1.0"
+serde_derive = "1.0"
