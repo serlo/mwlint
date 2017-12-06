@@ -3,7 +3,10 @@ extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 
-mod error;
+/// Provides linter result definitions.
+pub mod error;
+/// Various helper functions.
+pub mod utils;
 
 #[cfg(test)]
 mod tests {
