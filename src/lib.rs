@@ -7,6 +7,8 @@ extern crate serde_derive;
 pub mod error;
 /// Various helper functions.
 pub mod utils;
+/// The checking functions themselves.
+pub mod rules;
 
 #[cfg(test)]
 mod tests {

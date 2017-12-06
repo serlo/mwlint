@@ -3,7 +3,15 @@ name = "mwlint"
 version = "0.1.0"
 authors = ["Valentin Roland <valentin@vroland.de>"]
 
+[[bin]]
+name = "mwlint"
+path = "src/mwlint.rs"
+doc = true
+
 [dependencies]
 mediawiki_parser = { git = "https://github.com/vroland/mediawiki-peg-rust.git" }
 serde = "1.0"
 serde_derive = "1.0"
+serde_yaml = "0.7"
+colored = "1.6"
+argparse = "0.2"

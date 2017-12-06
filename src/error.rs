@@ -6,11 +6,11 @@ use mediawiki_parser::ast;
 /// Specifies an issue identified by the linter.
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields, rename_all="lowercase")]
-pub struct Lint<'a> {
-    position: ast::Span,
-    message: &'a str,
-    solution: &'a str,
-    severity: Severity,
+pub struct Lint {
+    pub position: ast::Span,
+    pub message: String,
+    pub solution: String,
+    pub severity: Severity,
 }
 
 
@@ -23,14 +23,15 @@ pub enum Severity {
     Error,
 }
 
-impl<'a> fmt::Display for Lint<'a> {
+impl fmt::Display for Lint {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        write!(f, "{}", self.message)
+        writeln!(f, "{}", self.message)?;
+        writeln!(f, "try: {}", self.solution)
     }
 }
 
-impl<'a> error::Error for Lint<'a> {
+impl error::Error for Lint {
     fn description(&self) -> &str {
-        self.message
+        &self.message
     }
 }

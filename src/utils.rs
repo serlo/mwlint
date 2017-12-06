@@ -2,30 +2,30 @@ use error;
 use mediawiki_parser::ast::*;
 
 /// Signature of a linter function.
-type LintFunc = Fn(&Element, &mut Vec<&Element>, &mut Vec<error::Lint>);
+type LintFunc<'a> = Fn(&'a Element, &mut Vec<&'a Element>, &mut Vec<error::Lint>);
 
 /// Function appying a linter function to a list of elements.
-type LintVec = Fn(&LintFunc, &Vec<Element>, &mut Vec<&Element>, &mut Vec<error::Lint>);
+type LintVec<'a> = Fn(&LintFunc<'a>, &'a Vec<Element>, &mut Vec<&'a Element>, &mut Vec<error::Lint>);
 
 /// Execute a lint function for every element of a list.
-pub fn lint_vec(func: &LintFunc, elements: &Vec<Element>, path: &mut Vec<&Element>, lints: &mut Vec<error::Lint>) {
+pub fn lint_vec<'a>(func: &LintFunc<'a>, elements: &'a Vec<Element>, path: &mut Vec<&'a Element>, lints: &mut Vec<error::Lint>) {
 
-    for element in &elements[..] {
+    for element in elements {
         let mut sublints = vec![];
-        func(element, path, &mut sublints);
+        func(&element, path, &mut sublints);
         lints.append(&mut sublints);
     }
 }
 
 /// Execute a lint function for a tree element recursively.
-pub fn lint_elem<'a>(elem_func: &LintFunc, root: &'a Element, path: &mut Vec<&'a Element>, lints: &mut Vec<error::Lint>) {
+pub fn lint_elem<'a>(elem_func: &LintFunc<'a>, root: &'a Element, path: &mut Vec<&'a Element>, lints: &mut Vec<error::Lint>) {
 
     lint_elem_template(elem_func, &lint_vec, root, path, lints);
 }
 
 
 /// A helper function for traversing a syntax tree recursively.
-pub fn lint_elem_template<'a>(elem_func: &LintFunc, vec_func: &LintVec, root: &'a Element, path: &mut Vec<&'a Element>, lints: &mut Vec<error::Lint>) {
+pub fn lint_elem_template<'a>(elem_func: &LintFunc<'a>, vec_func: &LintVec<'a>, root: &'a Element, path: &mut Vec<&'a Element>, lints: &mut Vec<error::Lint>) {
 
     let mut sublints = vec![];
     path.push(root);
