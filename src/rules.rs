@@ -26,7 +26,7 @@ pub fn check_heading_depths<'a>(root: &'a Element, path: &mut Vec<&'a Element>, 
                         if current_depth > depth + 1 {
                             let err = Lint {
                                 position: position.clone(),
-                                message: "A sub heading should be exactly one level deeper than it's parent heading!".to_string(),
+                                message: "A sub heading should be exactly one level deeper than its parent heading!".to_string(),
                                 solution: format!("Reduce depth of this heading by {}.", current_depth - depth - 1),
                                 severity: Severity::Warning,
                             };

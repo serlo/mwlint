@@ -2,6 +2,8 @@ extern crate mediawiki_parser;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
+extern crate colored;
+
 
 /// Provides linter result definitions.
 pub mod error;

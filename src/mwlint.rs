@@ -3,7 +3,6 @@ extern crate serde_yaml;
 extern crate argparse;
 extern crate mwlint;
 
-use std::io;
 use std::process;
 use argparse::{ArgumentParser, StoreTrue, Store};
 
