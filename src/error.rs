@@ -6,7 +6,7 @@ use colored::*;
 
 /// Specifies an issue identified by the linter.
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields, rename_all="lowercase")]
+#[serde(deny_unknown_fields, rename_all = "lowercase")]
 pub struct Lint {
     pub position: ast::Span,
     pub message: String,
@@ -17,7 +17,7 @@ pub struct Lint {
 
 /// The issue severity.
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields, rename_all="lowercase")]
+#[serde(deny_unknown_fields, rename_all = "lowercase")]
 pub enum Severity {
     Info,
     Warning,
@@ -26,10 +26,14 @@ pub enum Severity {
 
 impl fmt::Display for Lint {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        let message = format!(" at {}:{} to {}:{}: {}",
-            self.position.start.line, self.position.start.col,
-            self.position.end.line, self.position.end.col,
-            self.message);
+        let message = format!(
+            " at {}:{} to {}:{}: {}",
+            self.position.start.line,
+            self.position.start.col,
+            self.position.end.line,
+            self.position.end.col,
+            self.message
+        );
         let fancy = match self.severity {
             Severity::Info => format!("INFO: {}", message).blue(),
             Severity::Warning => format!("WARNING: {}", message).bright_yellow(),

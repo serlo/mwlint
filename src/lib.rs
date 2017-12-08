@@ -3,6 +3,7 @@ extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 extern crate colored;
+extern crate config;
 
 
 /// Provides linter result definitions.
@@ -11,6 +12,8 @@ pub mod error;
 pub mod utils;
 /// The checking functions themselves.
 pub mod rules;
+/// Structures for configuration of linter behaviour.
+pub mod settings;
 
 #[cfg(test)]
 mod tests {
