@@ -1,7 +1,7 @@
 use error;
 use mediawiki_parser::ast::*;
 use settings::Settings;
-
+use std::fmt;
 
 /// Signature of a linter function.
 pub type LintFunc<'a> = Fn(&'a Element,
@@ -42,6 +42,52 @@ pub fn lint_elem<'a>(
 ) {
 
     lint_elem_template(elem_func, &lint_vec, root, path, settings, lints);
+}
+
+/// Metadata of a linter rule.
+#[derive(Serialize, Deserialize)]
+pub struct Rule<'a> {
+    pub description: String,
+    pub name: String,
+    pub enable: bool,
+
+    #[serde(skip)]
+    pub function: Option<&'a LintFunc<'a>>,
+}
+
+/// Reads all enclosed functions and builds a function returning rule meta data.
+///
+/// Signature of the new function: `pub fn get_rules() -> Vec<Rule>`
+macro_rules! build_rule_meta {
+    ($(#[doc=$doc:expr] pub fn $name:ident <$lt:tt> ($($rest:tt)*) $body:block)*) => {
+        /// Collect metadata of enclosed rules and return it at run time.
+        pub fn get_rules<'a>() -> Vec<Rule<'a>> {
+            let mut rules = vec![];
+                $(
+                    rules.push(Rule {
+                        description: $doc.trim().to_string(),
+                        name: stringify!($name).to_string(),
+                        enable: true,
+                        function: Some(&$name),
+                    });
+                )*
+            rules
+        }
+        $(
+            #[doc=$doc]
+            pub fn $name <$lt> ($( $rest )*) $body
+        )*
+    };
+    ($($t:tt)*) => {
+        compile_error!(
+"A linter rule must have the following signature:
+
+/// mandatory description
+pub fn func_name<'root_lifetime>(<args>) {..}
+
+If you want to define helper structures or functions,
+define them inside your function or outside of build_rule_meta!.");
+    }
 }
 
 
@@ -125,3 +171,10 @@ pub fn lint_elem_template<'a>(
     path.pop();
     lints.append(&mut sublints);
 }
+
+impl<'a> fmt::Debug for Rule<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Rule {{ name: {}, enable: {} }}", &self.name, self.enable)
+    }
+}
+

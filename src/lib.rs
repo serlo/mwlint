@@ -9,6 +9,7 @@ extern crate config;
 /// Provides linter result definitions.
 pub mod error;
 /// Various helper functions.
+#[macro_use]
 pub mod utils;
 /// The checking functions themselves.
 pub mod rules;

@@ -36,19 +36,17 @@ fn main() {
         ap.refer(&mut dump_default_config).add_option(
             &["-d", "--dump-settings"],
             StoreTrue,
-            "Dump the default settings to stdout."
+            "Dump the current settings to stdout. \
+             If no configuration file is loaded, \
+             dump the default options."
         );
 
         ap.parse_args_or_exit();
     }
+    let root;
 
-    let rules = mwlint::rules::get_rule_meta();
-
-    for rule in rules {
-        println!("Name: {}\nDesc: {}\n", rule.name, rule.description);
-    }
-
-    let settings: mwlint::settings::Settings = Default::default();
+    let mut settings: mwlint::settings::Settings = Default::default();
+    settings.append_rules(&mut mwlint::rules::get_rules());
 
     if dump_default_config {
         println!("{}", toml::to_string(&settings)
@@ -66,11 +64,20 @@ fn main() {
         process::exit(1);
     }
 
-    let result = serde_yaml::from_str(&input).expect("Could not parse input file!");
 
+    root= serde_yaml::from_str(&input).expect("Could not parse input file!");
     let mut lints = vec![];
     let mut path = vec![];
-    mwlint::rules::check_heading_depths(&result, &mut path, &settings, &mut lints);
+
+    for rule in &settings.rules[..] {
+        if rule.enable {
+            match rule.function {
+                Some(f) => f(&root, &mut path, &settings, &mut lints),
+                None => (),
+            };
+        }
+    }
+
     for lint in &lints {
         eprintln!("{}", lint);
     }

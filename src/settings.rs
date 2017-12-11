@@ -1,8 +1,10 @@
+use utils::*;
 
 /// The general settings structure.
 #[derive(Debug, Default, Serialize, Deserialize)]
-pub struct Settings {
+pub struct Settings<'a> {
     pub parameters: RuleParameters,
+    pub rules: Vec<Rule<'a>>,
 }
 
 /// Parameters for linter rules.
@@ -17,3 +19,19 @@ impl Default for RuleParameters {
     }
 }
 
+impl<'a> Settings<'a> {
+    pub fn append_rules(&mut self, rules: &mut Vec<Rule<'a>>) {
+        for rule in rules.drain(..) {
+            let mut found = false;
+            for existing in &self.rules {
+                if existing.name == rule.name {
+                    found = true;
+                    break;
+                }
+            }
+            if !found {
+                self.rules.push(rule);
+            }
+        }
+    }
+}
