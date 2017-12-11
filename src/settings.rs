@@ -20,18 +20,17 @@ impl Default for RuleParameters {
 }
 
 impl<'a> Settings<'a> {
-    pub fn append_rules(&mut self, rules: &mut Vec<Rule<'a>>) {
-        for rule in rules.drain(..) {
-            let mut found = false;
-            for existing in &self.rules {
+    /// merge a list of rules into this settings struct.
+    pub fn merge_rules(&mut self, rules: &mut Vec<Rule<'a>>) {
+        'others: for rule in rules.drain(..) {
+            for existing in &mut self.rules {
                 if existing.name == rule.name {
-                    found = true;
-                    break;
+                    existing.description = rule.description;
+                    existing.function = rule.function;
+                    continue 'others;
                 }
             }
-            if !found {
-                self.rules.push(rule);
-            }
+            self.rules.push(rule);
         }
     }
 }

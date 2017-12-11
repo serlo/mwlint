@@ -17,8 +17,9 @@ patterns and other nitpicks."
 
 fn main() {
     let mut use_stdin = false;
-    let mut dump_default_config = false;
+    let mut dump_config = false;
     let mut input_file = "".to_string();
+    let mut config_file = "".to_string();
     {
         let mut ap = ArgumentParser::new();
         ap.set_description(DESCRIPTION!());
@@ -33,22 +34,35 @@ fn main() {
             Store,
             "Path to the input file",
         );
-        ap.refer(&mut dump_default_config).add_option(
+        ap.refer(&mut dump_config).add_option(
             &["-d", "--dump-settings"],
             StoreTrue,
             "Dump the current settings to stdout. \
              If no configuration file is loaded, \
              dump the default options."
         );
-
+        ap.refer(&mut config_file).add_option(
+            &["-c", "--config"],
+            Store,
+            "A config file to override the default options."
+        );
         ap.parse_args_or_exit();
     }
     let root;
 
-    let mut settings: mwlint::settings::Settings = Default::default();
-    settings.append_rules(&mut mwlint::rules::get_rules());
+    let mut settings: mwlint::settings::Settings;
 
-    if dump_default_config {
+    if !config_file.is_empty() {
+        let config_source = mediawiki_parser::util::read_file(&config_file);
+        settings = toml::from_str(&config_source)
+            .expect("Could not parse settings file!");
+    } else {
+        settings = Default::default();
+    }
+
+    settings.merge_rules(&mut mwlint::rules::get_rules());
+
+    if dump_config {
         println!("{}", toml::to_string(&settings)
             .expect("Could serialize settings!"));
         process::exit(0);
