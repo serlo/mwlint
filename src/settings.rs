@@ -10,12 +10,18 @@ pub struct Settings<'a> {
 /// Parameters for linter rules.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RuleParameters {
+    /// Maximum allowed depth of a heading.
     pub max_heading_depth: usize,
+    /// A list of allowed template names. If empty, all templates are allowed.
+    pub template_whitelist: Vec<String>,
 }
 
 impl Default for RuleParameters {
     fn default() -> Self {
-        RuleParameters { max_heading_depth: 4 }
+        RuleParameters {
+            max_heading_depth: 4,
+            template_whitelist: vec![],
+        }
     }
 }
 

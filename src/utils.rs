@@ -166,7 +166,8 @@ pub fn lint_elem_template<'a>(
         &Element::Comment { .. } => (),
         &Element::HtmlTag { ref content, .. } => {
             vec_func(elem_func, content, path, settings, &mut sublints);
-        }
+        },
+        &Element::Error { .. } => (),
     }
     path.pop();
     lints.append(&mut sublints);

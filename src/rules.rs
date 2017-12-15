@@ -134,4 +134,72 @@ pub fn check_lists<'a>(
     lint_elem(&check_lists, root, path, settings, lints);
 }
 
+
+/// Verify templates are whitelisted.
+pub fn check_template_whitelist<'a>(
+    root: &'a Element,
+    path: &mut Vec<&'a Element>,
+    settings: &Settings,
+    lints: &mut Vec<Lint>,
+) {
+    match root {
+        &Element::Template { ref name, ref position, .. } => {
+
+            let template_name_err = Lint {
+                position: position.clone(),
+                message: "Template name is not text-only. This could make further \
+                        processing more complicated.".to_string(),
+                solution: "Maybe a flat template name is also suitable here.".to_string(),
+                severity: Severity::Info,
+            };
+
+            if name.len() != 1 {
+                lints.push(template_name_err);
+            } else {
+                let check_text = | text: &String, position: &Span, lints: &mut Vec<Lint> | {
+                    if !settings.parameters.template_whitelist.contains(text) {
+
+                        let err = Lint {
+                            position: position.clone(),
+                            message: format!("Template name '{}' \
+                                    is not in template whitelist!", text),
+                            solution: "Consider using a whitelisted template. If there \
+                                    is none, think about adding a semantic template \
+                                    to the whitelist instead of using only \
+                                    visual markup!".to_string(),
+                            severity: Severity::Warning,
+                        };
+                        lints.push(err);
+                    }
+                };
+                match name.first() {
+                    Some(&Element::Text { ref text, ref position }) => {
+                        check_text(&text.trim().to_string(), position, lints);
+                    },
+                    Some(&Element::Paragraph { ref content, .. }) => {
+                        if content.len() != 1 {
+                            lints.push(template_name_err);
+                        } else {
+                            match content.first() {
+                                Some(&Element::Text { ref text, ref position }) => {
+                                    check_text(&text.trim().to_string(), position, lints);
+                                },
+                                _ => {
+                                    lints.push(template_name_err);
+                                }
+                            }
+                        }
+                    },
+                    _ => {
+                        lints.push(template_name_err);
+                    }
+                }
+            }
+        },
+        _ => (),
+    };
+    lint_elem(&check_template_whitelist, root, path, settings, lints);
+}
+
+
 }
