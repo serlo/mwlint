@@ -122,8 +122,9 @@ pub fn lint_elem_template<'a>(
         &Element::Paragraph { ref content, .. } => {
             vec_func(elem_func, content, path, settings, &mut sublints);
         }
-        &Element::Template { ref content, .. } => {
+        &Element::Template { ref content, ref name, .. } => {
             vec_func(elem_func, content, path, settings, &mut sublints);
+            vec_func(elem_func, name, path, settings, &mut sublints);
         }
         &Element::TemplateArgument { ref value, .. } => {
             vec_func(elem_func, value, path, settings, &mut sublints);
