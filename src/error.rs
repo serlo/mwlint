@@ -1,14 +1,14 @@
 use std::error;
 use std::fmt;
-use mediawiki_parser::ast;
+use mediawiki_parser::*;
 use colored::*;
 
 
 /// Specifies an issue identified by the linter.
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields, rename_all = "lowercase")]
 pub struct Lint {
-    pub position: ast::Span,
+    pub position: Span,
     pub message: String,
     pub solution: String,
     pub severity: Severity,
@@ -16,7 +16,7 @@ pub struct Lint {
 
 
 /// The issue severity.
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields, rename_all = "lowercase")]
 pub enum Severity {
     Info,

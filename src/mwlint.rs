@@ -5,6 +5,9 @@ extern crate mwlint;
 extern crate toml;
 
 use std::process;
+use mediawiki_parser::*;
+use std::fs;
+use std::io;
 use argparse::{ArgumentParser, StoreTrue, Store};
 
 macro_rules! DESCRIPTION {
@@ -48,8 +51,8 @@ fn main() {
         );
         ap.parse_args_or_exit();
     }
-    let root;
 
+    /*
     let mut settings: mwlint::settings::Settings;
 
     if !config_file.is_empty() {
@@ -67,29 +70,21 @@ fn main() {
             .expect("Could serialize settings!"));
         process::exit(0);
     }
-
-    let input: String;
-    if use_stdin {
-        input = mediawiki_parser::util::read_stdin();
-    } else if !input_file.is_empty() {
-        input = mediawiki_parser::util::read_file(&input_file);
+    */
+    let root = (if !input_file.is_empty() {
+        let file = fs::File::open(&input_file)
+            .expect("Could not open input file!");
+        serde_yaml::from_reader(&file)
     } else {
-        eprintln!("No input source specified!");
-        process::exit(1);
-    }
+        serde_yaml::from_reader(io::stdin())
+    }).expect("Could not parse input!");
 
-
-    root= serde_yaml::from_str(&input).expect("Could not parse input file!");
     let mut lints = vec![];
-    let mut path = vec![];
-
-    for rule in &settings.rules[..] {
-        if rule.enable {
-            match rule.function {
-                Some(f) => f(&root, &mut path, &settings, &mut lints),
-                None => (),
-            };
-        }
+    let params = mwlint::settings::RuleParameters::default();
+    for mut rule in mwlint::rules::get_rules() {
+        rule.run(&root, &params, &mut vec![]);
+        let mut rule_lints = (*rule.lints()).clone();
+        lints.append(&mut rule_lints);
     }
 
     for lint in &lints {

@@ -1,14 +1,23 @@
 use utils::*;
 
+/*
 /// The general settings structure.
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct Settings<'a> {
     pub parameters: RuleParameters,
     pub rules: Vec<Rule<'a>>,
 }
+*/
+
+/// Rule metadata.
+#[derive(Debug, Serialize, PartialEq, Clone, Deserialize)]
+pub struct RuleMeta {
+    pub name: String,
+    pub description: String,
+}
 
 /// Parameters for linter rules.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, PartialEq, Clone, Deserialize)]
 pub struct RuleParameters {
     /// Maximum allowed depth of a heading.
     pub max_heading_depth: usize,
@@ -25,6 +34,7 @@ impl Default for RuleParameters {
     }
 }
 
+/*
 impl<'a> Settings<'a> {
     /// merge a list of rules into this settings struct.
     pub fn merge_rules(&mut self, rules: &mut Vec<Rule<'a>>) {
@@ -40,3 +50,4 @@ impl<'a> Settings<'a> {
         }
     }
 }
+*/
