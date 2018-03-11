@@ -14,7 +14,7 @@ pub trait Rule<'e, 's>: Traversion<'e, &'s Settings> + 'e {
 }
 
 macro_rules! rule_impl {
-    ($t:ident, $desc:expr => $($name:ident, $bad:expr, $bad_expl:expr, $good:expr, $good_expl:expr)*) => {
+    ($t:ident, $desc:expr => examples: $($name:ident, $bad:expr, $bad_expl:expr, $good:expr, $good_expl:expr);*) => {
         #[doc = $desc]
         ///# Examples
         $(
