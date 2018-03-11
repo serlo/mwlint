@@ -20,6 +20,14 @@ pub struct Lint {
     pub severity: Severity,
 }
 
+/// Defines specific types of lints.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields, rename_all = "lowercase")]
+pub enum LintType {
+    MaxHeadingDepthViolation(Lint),
+    InconsistentHeadingHierarchy(Lint),
+}
+
 /// Specifies examples for linter rules.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields, rename_all = "lowercase")]
@@ -43,6 +51,16 @@ pub enum Severity {
     Info,
     Warning,
     Error,
+}
+
+impl fmt::Display for LintType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        let lint = match *self {
+            LintType::MaxHeadingDepthViolation(ref l) => l,
+            LintType::InconsistentHeadingHierarchy(ref l) => l,
+        };
+        write!(f, "{}", lint)
+    }
 }
 
 impl fmt::Display for Lint {

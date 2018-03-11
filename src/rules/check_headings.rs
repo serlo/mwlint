@@ -4,7 +4,6 @@ use mediawiki_parser::*;
 use settings::*;
 use std::io;
 
-
 rule_impl!(CheckHeadings, "Checks for inconsistent heading depths." => examples:
 deep_heading,
 "\
@@ -15,6 +14,46 @@ Bla Blubb
 "== Normal Heading
 Normal text
 ", "This heading is just fine.");
+
+
+fn max_depth_lint(
+    settings: &Settings,
+    position: &Span
+) -> LintType {
+    let max = settings.max_heading_depth;
+    LintType::MaxHeadingDepthViolation(Lint {
+        position: position.clone(),
+        explanation: format!(
+            "A heading should not be deeper than level {}!", max),
+        explanation_long: format!(
+            "MFNF aims for a relatively shallow article structure. \
+            To achieve this, the minimum heading level allowed is 2, \
+            the maximum heading level is {}.", max),
+        solution:
+            "Change your article to have a more shallow structure.".into(),
+        severity: Severity::Warning,
+    })
+}
+
+fn inconsistent_hierarchy_lint(
+    position: &Span,
+    diff: usize
+) -> LintType {
+    LintType::InconsistentHeadingHierarchy(Lint {
+        position: position.clone(),
+        explanation: "A sub heading should be exactly one level \
+                        deeper than its parent heading!".into(),
+        explanation_long: format!(
+            "If a heading has a higher heading than a previous heading, \
+            it is considered a sub heading of this heading. Thus, headings are \
+            make up a hierarchy. But a heading more than one level deeper than \
+            its parent makes no semantic sense. Heading levels should not be used \
+            to do text formatting!"),
+        solution: format!("Reduce depth of this heading by {}.", diff),
+        severity: Severity::Warning,
+    })
+}
+
 impl<'e, 's> Traversion<'e, &'s Settings> for CheckHeadings<'e> {
 
     path_impl!();
@@ -32,18 +71,7 @@ impl<'e, 's> Traversion<'e, &'s Settings> for CheckHeadings<'e> {
 
             // is heading too deep?
             if depth > settings.max_heading_depth {
-                let err = Lint {
-                    position: position.clone(),
-                    explanation: format!("A heading should not be deeper than level {}!",
-                             settings.max_heading_depth),
-                    explanation_long: "MFNF aims for a relatively shallow article structure. \
-                                      To achieve this, the minimum heading level allowed is 2, \
-                                      the maximum heading level is 4.".into(),
-                    solution: "Change your article \
-                               to have a more shallow structure.".into(),
-                    severity: Severity::Warning,
-                };
-                self.push(err);
+                self.push(max_depth_lint(settings, position));
             }
 
             let current_depth = depth;
@@ -57,17 +85,10 @@ impl<'e, 's> Traversion<'e, &'s Settings> for CheckHeadings<'e> {
 
                 if let Some(&&Element::Heading { depth, .. }) = parent {
                     if current_depth > depth + 1 {
-                        consistency_lint = Some(Lint {
-                            position: position.clone(),
-                            explanation: "A sub heading should be exactly one level \
-                                        deeper than its parent heading!".to_string(),
-                            solution: format!("Reduce depth of this heading by {}.",
-                                        current_depth - depth - 1),
-                            explanation_long: "MFNF aims for a relatively shallow article structure. \
-                                        To achieve this, the minimum heading level allowed is 2, \
-                                        the maximum heading level is 4.".into(),
-                            severity: Severity::Warning,
-                        });
+                        consistency_lint = Some(inconsistent_hierarchy_lint(
+                            position,
+                            current_depth - depth - 1,
+                        ));
                     }
                 }
             }
