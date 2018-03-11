@@ -8,6 +8,7 @@ use std::process;
 use mediawiki_parser::*;
 use std::fs;
 use std::io;
+use mwlint::*;
 use argparse::{ArgumentParser, StoreTrue, Store};
 
 macro_rules! DESCRIPTION {
@@ -71,7 +72,7 @@ fn main() {
         process::exit(0);
     }
     */
-    let root = (if !input_file.is_empty() {
+    let root: Element = (if !input_file.is_empty() {
         let file = fs::File::open(&input_file)
             .expect("Could not open input file!");
         serde_yaml::from_reader(&file)
@@ -80,11 +81,11 @@ fn main() {
     }).expect("Could not parse input!");
 
     let mut lints = vec![];
-    let params = mwlint::settings::RuleParameters::default();
-    for mut rule in mwlint::rules::get_rules() {
-        rule.run(&root, &params, &mut vec![]);
-        let mut rule_lints = (*rule.lints()).clone();
-        lints.append(&mut rule_lints);
+    let settings = Settings::default();
+    for mut rule in get_rules() {
+        rule.run(&root, &settings, &mut vec![])
+            .expect("error while checking rule!");
+        lints.append(&mut rule.lints().clone())
     }
 
     for lint in &lints {

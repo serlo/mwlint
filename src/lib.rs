@@ -6,12 +6,16 @@ extern crate colored;
 
 
 /// Provides linter result definitions.
-pub mod error;
+mod error;
 /// Various helper functions.
 #[macro_use]
-pub mod utils;
+mod utils;
 /// The checking functions themselves.
-pub mod rules;
+mod rules;
 /// Structures for configuration of linter behaviour.
-pub mod settings;
+mod settings;
 
+pub use settings::{Settings};
+pub use utils::{Rule, Checkable};
+pub use error::{Example, Lint, Severity};
+pub use rules::*;

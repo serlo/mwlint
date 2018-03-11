@@ -4,9 +4,11 @@ use mediawiki_parser::*;
 use settings::*;
 use std::io;
 
-mod check_template_whitelist;
-mod check_headings;
-mod check_lists;
+//mod check_template_whitelist;
+pub mod check_headings;
+//mod check_lists;
+
+pub use self::check_headings::*;
 
 macro_rules! register {
     ($list:ident, $t1:tt :: $t2:tt) => {
@@ -17,7 +19,7 @@ macro_rules! register {
 pub fn get_rules<'e, 's>() -> Vec<Box<Rule<'e, 's>>> {
     let mut rules: Vec<Box<Rule<'e, 's>>> = vec![];
     register!(rules, check_headings::CheckHeadings);
-    register!(rules, check_lists::CheckLists);
-    register!(rules, check_template_whitelist::CheckTemplateWhitelist);
+    //register!(rules, check_lists::CheckLists);
+    //register!(rules, check_template_whitelist::CheckTemplateWhitelist);
     rules
 }

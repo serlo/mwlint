@@ -5,22 +5,26 @@ use settings::*;
 use std::io;
 
 
-/// Tests for inconsistent heading depths.
-#[derive(Debug, Default)]
-pub struct CheckHeadings<'e> {
-    pub path: Vec<&'e Element>,
-    pub lints: Vec<Lint>,
-}
+rule_impl!(CheckHeadings, "Checks for inconsistent heading depths." =>
+deep_heading,
+"\
+===== Deep Heading
+Bla Blubb
+",
+"This heading is too deep.",
+"== Normal Heading
+Normal text
+",
+"This heading is just fine."
+);
 
-rule_impl!("check headings", "headings should have consistent depths.", CheckHeadings);
-
-impl<'e, 's> Traversion<'e, &'s RuleParameters> for CheckHeadings<'e> {
+impl<'e, 's> Traversion<'e, &'s Settings> for CheckHeadings<'e> {
 
     path_impl!();
 
     fn work(&mut self,
             root: &'e Element,
-            parameters: &RuleParameters,
+            settings: &Settings,
             _: &mut io::Write) -> io::Result<bool> {
 
         if let &Element::Heading {
@@ -32,13 +36,16 @@ impl<'e, 's> Traversion<'e, &'s RuleParameters> for CheckHeadings<'e> {
             let current_depth = depth;
 
             // is heading too deep?
-            if current_depth > parameters.max_heading_depth {
+            if current_depth > settings.max_heading_depth {
                 let err = Lint {
                     position: position.clone(),
-                    message: format!("A heading should not be deeper than level {}!",
-                             parameters.max_heading_depth),
+                    explanation: format!("A heading should not be deeper than level {}!",
+                             settings.max_heading_depth),
+                    explanation_long: "MFNF aims for a relatively shallow article structure. \
+                                      To achieve this, the minimum heading level allowed is 2, \
+                                      the maximum heading level is 4.".into(),
                     solution: "Change your article \
-                               to have a more shallow structure.".to_string(),
+                               to have a more shallow structure.".into(),
                     severity: Severity::Warning,
                 };
                 self.push(err);
@@ -49,10 +56,13 @@ impl<'e, 's> Traversion<'e, &'s RuleParameters> for CheckHeadings<'e> {
                     if current_depth > depth + 1 {
                         let err = Lint {
                             position: position.clone(),
-                            message: "A sub heading should be exactly one level \
+                            explanation: "A sub heading should be exactly one level \
                                         deeper than its parent heading!".to_string(),
                             solution: format!("Reduce depth of this heading by {}.",
                                         current_depth - depth - 1),
+                            explanation_long: "MFNF aims for a relatively shallow article structure. \
+                                      To achieve this, the minimum heading level allowed is 2, \
+                                      the maximum heading level is 4.".into(),
                             severity: Severity::Warning,
                         };
                         self.push(err);

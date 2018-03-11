@@ -8,12 +8,33 @@ use colored::*;
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields, rename_all = "lowercase")]
 pub struct Lint {
+    /// Position in the source document.
     pub position: Span,
-    pub message: String,
+    /// Short, general explanation.
+    pub explanation: String,
+    /// Long explanation of the lint.
+    pub explanation_long: String,
+    /// Explains what to do about it.
     pub solution: String,
+    /// Lint severity.
     pub severity: Severity,
 }
 
+/// Specifies examples for linter rules.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields, rename_all = "lowercase")]
+pub struct Example {
+    /// Example identifier.
+    pub name: String,
+    /// Example of a bad input.
+    pub bad: String,
+    /// Example of a good input.
+    pub good: String,
+    /// Explanation why the bad input is bad.
+    pub bad_explanation: String,
+    /// Explanation why the good input is good.
+    pub good_explanation: String,
+}
 
 /// The issue severity.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -32,7 +53,7 @@ impl fmt::Display for Lint {
             self.position.start.col,
             self.position.end.line,
             self.position.end.col,
-            self.message
+            self.explanation
         );
         let fancy = match self.severity {
             Severity::Info => format!("INFO: {}", message).blue(),
@@ -46,6 +67,6 @@ impl fmt::Display for Lint {
 
 impl error::Error for Lint {
     fn description(&self) -> &str {
-        &self.message
+        &self.explanation
     }
 }
