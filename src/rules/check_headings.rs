@@ -4,16 +4,24 @@ use mediawiki_parser::*;
 use settings::*;
 use std::io;
 
-rule_impl!(CheckHeadings, "Checks for inconsistent heading depths." => examples:
-deep_heading,
-"\
-===== Deep Heading
-Bla Blubb
-",
-"This heading is too deep.",
-"== Normal Heading
-Normal text
-", "This heading is just fine.");
+rule_impl!(CheckHeadings, "Checks for erroneous headings."
+    => examples:
+        deep_heading,
+        "===== deep heading\n",
+        "This heading is too deep.",
+        "== normal heading\n",
+        "This heading is just fine."
+        => LintType::MaxHeadingDepthViolation(_)
+    |
+        inconsistent_heading,
+        "== top level\n\
+        ==== low level\n",
+        "The lower level heading is a two levels deeper than its parent.",
+        "== top level\n\
+        === low level\n",
+        "The heading hierarchy is consistent."
+        => LintType::InconsistentHeadingHierarchy(_)
+);
 
 
 fn max_depth_lint(

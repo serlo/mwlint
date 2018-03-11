@@ -14,7 +14,16 @@ pub trait Rule<'e, 's>: Traversion<'e, &'s Settings> + 'e {
 }
 
 macro_rules! rule_impl {
-    ($t:ident, $desc:expr => examples: $($name:ident, $bad:expr, $bad_expl:expr, $good:expr, $good_expl:expr);*) => {
+    ($t:ident, $desc:expr =>
+        examples: $(
+            $name:ident,
+            $bad:expr,
+            $bad_expl:expr,
+            $good:expr,
+            $good_expl:expr
+            => $result:pat
+        )|*
+    ) => {
         #[doc = $desc]
         ///# Examples
         $(
@@ -54,7 +63,14 @@ macro_rules! rule_impl {
                 let good_lints = tree_good.check(&mut rule_good, &settings)
                     .expect("rule crashed!");
 
-                assert!(bad_lints.len() >= 1);
+                let mut bad_matches = 0;
+                for lint in bad_lints {
+                    if let $result = *lint {
+                        bad_matches += 1;
+                    }
+                }
+
+                assert!(bad_matches >= 1);
                 assert_eq!(good_lints.len(), 0);
             }
         )*
