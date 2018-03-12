@@ -1,11 +1,7 @@
-use error::*;
-use utils::*;
-use mediawiki_parser::*;
-use settings::*;
-use std::io;
+use rule::*;
 
 //mod check_template_whitelist;
-pub mod check_headings;
+mod check_headings;
 //mod check_lists;
 
 pub use self::check_headings::*;

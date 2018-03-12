@@ -6,16 +6,29 @@ extern crate colored;
 
 
 /// Provides linter result definitions.
-mod error;
+mod lint;
+/// Structures for configuration of linter behaviour.
+mod settings;
 /// Various helper functions.
 #[macro_use]
 mod utils;
+/// Data structures for defining rules.
+#[macro_use]
+mod rule;
+
+/// common imports for rules.
+mod preamble {
+    pub use lint::{Lint, LintType, Severity, Example};
+    pub use rule::*;
+    pub use mediawiki_parser::*;
+    pub use settings::{Settings, RuleMeta};
+    pub use std::io;
+}
+
 /// The checking functions themselves.
 mod rules;
-/// Structures for configuration of linter behaviour.
-mod settings;
 
 pub use settings::{Settings};
-pub use utils::{Rule, Checkable};
-pub use error::{Example, Lint, Severity};
+pub use rule::{Rule, Checkable};
+pub use lint::{Example, Lint, Severity};
 pub use rules::*;

@@ -1,4 +1,3 @@
-use utils::*;
 
 /// Rule metadata.
 #[derive(Debug, Serialize, PartialEq, Clone, Deserialize)]

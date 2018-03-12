@@ -1,8 +1,4 @@
-use error::*;
-use utils::*;
-use mediawiki_parser::*;
-use settings::*;
-use std::io;
+use preamble::*;
 
 rule_impl!(CheckHeadings, "Checks for erroneous headings."
     => examples:
@@ -16,7 +12,7 @@ rule_impl!(CheckHeadings, "Checks for erroneous headings."
         inconsistent_heading,
         "== top level\n\
         ==== low level\n",
-        "The lower level heading is a two levels deeper than its parent.",
+        "The lower level heading is two levels deeper than its parent.",
         "== top level\n\
         === low level\n",
         "The heading hierarchy is consistent."
