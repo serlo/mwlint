@@ -18,14 +18,20 @@ pub struct Lint {
     pub solution: String,
     /// Lint severity.
     pub severity: Severity,
+    /// The lint kind.
+    pub kind: LintKind,
 }
 
-/// Defines specific types of lints.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+/// Defines possible kinds of lints.
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields, rename_all = "lowercase")]
-pub enum LintType {
-    MaxHeadingDepthViolation(Lint),
-    InconsistentHeadingHierarchy(Lint),
+pub enum LintKind {
+    MaxHeadingDepthViolation,
+    InconsistentHeadingHierarchy,
+    DefinitionTermWithoutDef,
+    DefinitionWithoutTerm,
+    ListOneElement,
+    ListMixedType,
 }
 
 /// Specifies examples for linter rules.
@@ -42,6 +48,8 @@ pub struct Example {
     pub bad_explanation: String,
     /// Explanation why the good input is good.
     pub good_explanation: String,
+    /// The type of lint it should emitt.
+    pub lint_type: LintKind,
 }
 
 /// The issue severity.
@@ -51,16 +59,6 @@ pub enum Severity {
     Info,
     Warning,
     Error,
-}
-
-impl fmt::Display for LintType {
-    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        let lint = match *self {
-            LintType::MaxHeadingDepthViolation(ref l) => l,
-            LintType::InconsistentHeadingHierarchy(ref l) => l,
-        };
-        write!(f, "{}", lint)
-    }
 }
 
 impl fmt::Display for Lint {

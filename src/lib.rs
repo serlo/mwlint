@@ -18,7 +18,7 @@ mod rule;
 
 /// common imports for rules.
 mod preamble {
-    pub use lint::{Lint, LintType, Severity, Example};
+    pub use lint::{Lint, LintKind, Severity, Example};
     pub use rule::*;
     pub use mediawiki_parser::*;
     pub use settings::{Settings, RuleMeta};

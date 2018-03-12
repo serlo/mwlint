@@ -7,8 +7,8 @@ use std::io;
 /// Linter rule trait.
 pub trait Rule<'e, 's>: Traversion<'e, &'s Settings> + 'e {
     fn meta(&self) -> RuleMeta;
-    fn push(&mut self, lint: LintType);
-    fn lints(&self) -> &Vec<LintType>;
+    fn push(&mut self, lint: Lint);
+    fn lints(&self) -> &Vec<Lint>;
     fn examples(&self) -> Vec<Example>;
 }
 
@@ -26,6 +26,7 @@ macro_rules! rule_impl {
         #[doc = $desc]
         ///# Examples
         $(
+            /// # example
             #[doc = $bad_expl]
             ///
             ///```text
@@ -41,7 +42,7 @@ macro_rules! rule_impl {
         #[derive(Debug, Default)]
         pub struct $t<'e> {
             pub path: Vec<&'e Element>,
-            pub lints: Vec<LintType>,
+            pub lints: Vec<Lint>,
         }
         $(
             #[test]
@@ -60,7 +61,7 @@ macro_rules! rule_impl {
 
                 let mut bad_matches = 0;
                 for lint in bad_lints {
-                    if let $result = *lint {
+                    if let $result = lint.kind {
                         bad_matches += 1;
                     }
                 }
@@ -78,11 +79,11 @@ macro_rules! rule_impl {
                 }
             }
 
-            fn push(&mut self, lint: LintType) {
+            fn push(&mut self, lint: Lint) {
                 self.lints.push(lint);
             }
 
-            fn lints(&self) -> &Vec<LintType> {
+            fn lints(&self) -> &Vec<Lint> {
                 &self.lints
             }
 
@@ -100,7 +101,7 @@ pub trait Checkable  {
         &'e self,
         rule: &mut Rule<'e, 's>,
         settings: &'s Settings,
-    ) -> io::Result<&Vec<LintType>>;
+    ) -> io::Result<&Vec<Lint>>;
 }
 
 impl Checkable for Element {
@@ -108,7 +109,7 @@ impl Checkable for Element {
         &'e self,
         rule: &mut Rule<'e, 's>,
         settings: &'s Settings,
-    ) -> io::Result<&Vec<LintType>> {
+    ) -> io::Result<&Vec<Lint>> {
 
         rule.run(self, settings, &mut vec![])?;
         Ok(rule.lints())

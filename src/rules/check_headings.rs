@@ -7,7 +7,7 @@ rule_impl!(CheckHeadings, "Checks for erroneous headings."
         "This heading is too deep.",
         "== normal heading\n",
         "This heading is just fine."
-        => LintType::MaxHeadingDepthViolation(_)
+        => LintKind::MaxHeadingDepthViolation
     |
         inconsistent_heading,
         "== top level\n\
@@ -16,16 +16,16 @@ rule_impl!(CheckHeadings, "Checks for erroneous headings."
         "== top level\n\
         === low level\n",
         "The heading hierarchy is consistent."
-        => LintType::InconsistentHeadingHierarchy(_)
+        => LintKind::InconsistentHeadingHierarchy
 );
 
 
 fn max_depth_lint(
     settings: &Settings,
     position: &Span
-) -> LintType {
+) -> Lint {
     let max = settings.max_heading_depth;
-    LintType::MaxHeadingDepthViolation(Lint {
+    Lint {
         position: position.clone(),
         explanation: format!(
             "A heading should not be deeper than level {}!", max),
@@ -36,14 +36,15 @@ fn max_depth_lint(
         solution:
             "Change your article to have a more shallow structure.".into(),
         severity: Severity::Warning,
-    })
+        kind: LintKind::MaxHeadingDepthViolation,
+    }
 }
 
 fn inconsistent_hierarchy_lint(
     position: &Span,
     diff: usize
-) -> LintType {
-    LintType::InconsistentHeadingHierarchy(Lint {
+) -> Lint {
+    Lint {
         position: position.clone(),
         explanation: "A sub heading should be exactly one level \
                         deeper than its parent heading!".into(),
@@ -55,7 +56,8 @@ fn inconsistent_hierarchy_lint(
             to do text formatting!"),
         solution: format!("Reduce depth of this heading by {}.", diff),
         severity: Severity::Warning,
-    })
+        kind: LintKind::InconsistentHeadingHierarchy,
+    }
 }
 
 impl<'e, 's> Traversion<'e, &'s Settings> for CheckHeadings<'e> {
