@@ -49,7 +49,7 @@ pub struct Example {
     /// Explanation why the good input is good.
     pub good_explanation: String,
     /// The type of lint it should emitt.
-    pub lint_type: LintKind,
+    pub kind: LintKind,
 }
 
 /// The issue severity.
@@ -59,6 +59,16 @@ pub enum Severity {
     Info,
     Warning,
     Error,
+}
+
+impl fmt::Display for Example {
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        writeln!(f, "Example: {}", self.name.blue())?;
+        writeln!(f, "{}", self.bad_explanation)?;
+        writeln!(f, "{}", self.bad)?;
+        writeln!(f, "{}", self.good_explanation)?;
+        write!(f, "{}", self.good)
+    }
 }
 
 impl fmt::Display for Lint {
@@ -72,12 +82,13 @@ impl fmt::Display for Lint {
             self.explanation
         );
         let fancy = match self.severity {
-            Severity::Info => format!("INFO: {}", message).blue(),
-            Severity::Warning => format!("WARNING: {}", message).bright_yellow(),
-            Severity::Error => format!("ERROR: {}", message).red(),
+            Severity::Info => format!("INFO: {} ({:?})", message, self.kind).blue(),
+            Severity::Warning => format!("WARNING: {} ({:?})", message, self.kind).bright_yellow(),
+            Severity::Error => format!("ERROR: {} ({:?})", message, self.kind).red(),
         };
         writeln!(f, "{}", fancy.bold())?;
-        writeln!(f, "{} {}", "try:".green().bold(), self.solution)
+        writeln!(f, "{}", self.explanation_long)?;
+        write!(f, "{} {}", "try:".green().bold(), self.solution)
     }
 }
 

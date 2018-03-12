@@ -1,81 +1,81 @@
 use preamble::*;
 
 rule_impl!(CheckLists, "Checks for malformed lists"
-    => examples:
-        definition_term_without_def,
-        "; term 1\n\
-         ; term 2",
-        "The definitions of `term 1` and `term 2` are missing.",
-        "; term 1\n\
-         : definition 1\n\
-         ; term 2\n\
-         : definition 2",
-        "The terms `term 1` and `term 2` are followed by their definitions."
-        => LintKind::DefinitionTermWithoutDef
-    |
-        definition_term_single,
-        "; term 1\n",
-        "The definition of `term 1` is missing.",
-        "; term 1\n\
-         : definition 1\n",
-        "The terms `term 1` is followed by its definition."
-        => LintKind::DefinitionTermWithoutDef
-    |
-        definition_without_term,
-        ": definition 1\n",
-        "The term for definition `definition 1` is missing.",
-        "; term 1\n\
-         : definition 1\n",
-        "The term `term 1` is followed by its definition."
-        => LintKind::DefinitionWithoutTerm
-    |
-        multiple_defs_without_term,
-        "; term 1\n\
-         : definition 1\n\
-         : definition 2\n",
-        "The term for `definition 2` is missing.",
-        "; term 1\n\
-         : definition 1\n\
-         ; term 2\n\
-         : definition 2\n",
-        "The terms `term 1` and `term 2` are followed by their definition."
-        => LintKind::DefinitionWithoutTerm
-    |
-        list_one_item,
-        "* <math>1+1=3</math>\n",
-        "This is used to indent a single item. Semantically, this should not be a list.",
-        "{{formula|<math>1+1=3</math>}}",
-        "Instead, the formula template can be used to describe a distinct mathmatical fact."
-        => LintKind::ListOneElement
-    |
-        mixed_list,
-        "* item one\n\
-         * item two\n\
-         # item three\n",
-        "`item three` is ordered, but every other element is unordered.",
-        "* item one\n\
-         * item two\n\
-         * item three\n",
-        "The list type is consistent."
-        => LintKind::ListMixedType
-    |
-        mixed_sublist,
-        "* item one\n\
-         * item two\n\
-         * item three\n\
-         *; sub def term\n\
-         *: sub def text\n\
-         ** some more explanation.\n",
-        "The top level list is consistent, but a sublists contains definitions and unordered items.",
-        "* item one\n\
-         * item two\n\
-         * item three\n\
-         *; sub def term\n\
-         *: definition with longer explanation.\n\
-         * item three (alternative): {{:Mathe für Nicht-Freaks: Vorlage:Definition| title=...}}\n",
-        "Keep the sublist konsistent by either writing a longer definition or \
-        using a sematic template."
-        => LintKind::ListMixedType
+=> examples:
+    definition_term_without_def,
+    "; term 1\n\
+        ; term 2",
+    "The definitions of `term 1` and `term 2` are missing.",
+    "; term 1\n\
+        : definition 1\n\
+        ; term 2\n\
+        : definition 2",
+    "The terms `term 1` and `term 2` are followed by their definitions."
+    => LintKind::DefinitionTermWithoutDef
+;
+    definition_term_single,
+    "; term 1\n",
+    "The definition of `term 1` is missing.",
+    "; term 1\n\
+        : definition 1\n",
+    "The terms `term 1` is followed by its definition."
+    => LintKind::DefinitionTermWithoutDef
+;
+    definition_without_term,
+    ": definition 1\n",
+    "The term for definition `definition 1` is missing.",
+    "; term 1\n\
+        : definition 1\n",
+    "The term `term 1` is followed by its definition."
+    => LintKind::DefinitionWithoutTerm
+;
+    multiple_defs_without_term,
+    "; term 1\n\
+        : definition 1\n\
+        : definition 2\n",
+    "The term for `definition 2` is missing.",
+    "; term 1\n\
+        : definition 1\n\
+        ; term 2\n\
+        : definition 2\n",
+    "The terms `term 1` and `term 2` are followed by their definition."
+    => LintKind::DefinitionWithoutTerm
+;
+    list_one_item,
+    "* <math>1+1=3</math>\n",
+    "This is used to indent a single item. Semantically, this should not be a list.",
+    "{{formula|<math>1+1=3</math>}}",
+    "Instead, the formula template can be used to describe a distinct mathmatical fact."
+    => LintKind::ListOneElement
+;
+    mixed_list,
+    "* item one\n\
+        * item two\n\
+        # item three\n",
+    "`item three` is ordered, but every other element is unordered.",
+    "* item one\n\
+        * item two\n\
+        * item three\n",
+    "The list type is consistent."
+    => LintKind::ListMixedType
+;
+    mixed_sublist,
+    "* item one\n\
+        * item two\n\
+        * item three\n\
+        *; sub def term\n\
+        *: sub def text\n\
+        ** some more explanation.\n",
+    "The top level list is consistent, but a sublists contains definitions and unordered items.",
+    "* item one\n\
+        * item two\n\
+        * item three\n\
+        *; sub def term\n\
+        *: definition with longer explanation.\n\
+        * item three (alternative): {{:Mathe für Nicht-Freaks: Vorlage:Definition| title=...}}\n",
+    "Keep the sublist konsistent by either writing a longer definition or \
+    using a sematic template."
+    => LintKind::ListMixedType
 );
 
 fn term_without_def(
@@ -201,7 +201,7 @@ impl<'e, 's> Traversion<'e, &'s Settings> for CheckLists<'e> {
                         let fac_prev = term_to_def(&prev);
 
                         if fac_kind != fac_prev {
-                            self.push(list_mixed_type(position));
+                            self.push(list_mixed_type(item.get_position()));
                         }
                     }
 

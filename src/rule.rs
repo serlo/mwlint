@@ -5,11 +5,11 @@ use std::io;
 
 
 /// Linter rule trait.
-pub trait Rule<'e, 's>: Traversion<'e, &'s Settings> + 'e {
+pub trait Rule<'e, 's: 'e>: Traversion<'e, &'s Settings> + 'e {
     fn meta(&self) -> RuleMeta;
     fn push(&mut self, lint: Lint);
     fn lints(&self) -> &Vec<Lint>;
-    fn examples(&self) -> Vec<Example>;
+    fn examples(&self) -> &Vec<Example>;
 }
 
 macro_rules! rule_impl {
@@ -20,8 +20,8 @@ macro_rules! rule_impl {
             $bad_expl:expr,
             $good:expr,
             $good_expl:expr
-            => $result:pat
-        )|*
+            => $result:expr
+        );*
     ) => {
         #[doc = $desc]
         ///# Examples
@@ -39,10 +39,32 @@ macro_rules! rule_impl {
             #[doc = $good]
             ///```
         )*
-        #[derive(Debug, Default)]
+        #[derive(Debug)]
         pub struct $t<'e> {
             pub path: Vec<&'e Element>,
             pub lints: Vec<Lint>,
+            pub examples: Vec<Example>,
+        }
+
+        impl<'e> $t<'e> {
+            pub fn new() -> $t<'e> {
+                $t {
+                    examples: vec![
+                        $(
+                        Example {
+                            name: stringify!($name).into(),
+                            bad: $bad.into(),
+                            bad_explanation: $bad_expl.into(),
+                            good: $good.into(),
+                            good_explanation: $good_expl.into(),
+                            kind: $result.into(),
+                        },
+                        )*
+                    ],
+                    path: vec![],
+                    lints: vec![],
+                }
+            }
         }
         $(
             #[test]
@@ -61,7 +83,7 @@ macro_rules! rule_impl {
 
                 let mut bad_matches = 0;
                 for lint in bad_lints {
-                    if let $result = lint.kind {
+                    if $result == lint.kind {
                         bad_matches += 1;
                     }
                 }
@@ -71,7 +93,7 @@ macro_rules! rule_impl {
             }
         )*
 
-        impl<'e, 's> Rule<'e, 's> for $t<'e> {
+        impl<'e, 's: 'e> Rule<'e, 's> for $t<'e> {
             fn meta(&self) -> RuleMeta {
                 RuleMeta {
                     name: stringify!($t).into(),
@@ -87,8 +109,8 @@ macro_rules! rule_impl {
                 &self.lints
             }
 
-            fn examples(&self) -> Vec<Example>{
-                vec![]
+            fn examples(&self) -> &Vec<Example>{
+                &self.examples
             }
 
         }

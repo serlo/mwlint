@@ -80,9 +80,11 @@ fn main() {
         serde_yaml::from_reader(io::stdin())
     }).expect("Could not parse input!");
 
-    let mut lints = vec![];
     let settings = Settings::default();
-    for mut rule in get_rules() {
+    let mut rules = get_rules();
+    let mut lints = vec![];
+
+    for mut rule in &mut rules {
         rule.run(&root, &settings, &mut vec![])
             .expect("error while checking rule!");
         lints.append(&mut rule.lints().clone())
@@ -90,7 +92,10 @@ fn main() {
 
     for lint in &lints {
         eprintln!("{}", lint);
+        eprintln!("Examples:");
+        let examples = get_examples(&rules, lint.kind);
+        for example in examples {
+            eprintln!("{}", example);
+        }
     }
-    println!("{}", serde_yaml::to_string(&lints).expect("Could not serialize lint!"));
-
 }

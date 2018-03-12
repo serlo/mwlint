@@ -1,22 +1,22 @@
 use preamble::*;
 
 rule_impl!(CheckHeadings, "Checks for erroneous headings."
-    => examples:
-        deep_heading,
-        "===== deep heading\n",
-        "This heading is too deep.",
-        "== normal heading\n",
-        "This heading is just fine."
-        => LintKind::MaxHeadingDepthViolation
-    |
-        inconsistent_heading,
-        "== top level\n\
-        ==== low level\n",
-        "The lower level heading is two levels deeper than its parent.",
-        "== top level\n\
-        === low level\n",
-        "The heading hierarchy is consistent."
-        => LintKind::InconsistentHeadingHierarchy
+=> examples:
+    deep_heading,
+    "===== deep heading\n",
+    "This heading is too deep.",
+    "== normal heading\n",
+    "This heading is just fine."
+    => LintKind::MaxHeadingDepthViolation
+;
+    inconsistent_heading,
+    "== top level\n\
+    ==== low level\n",
+    "The lower level heading is two levels deeper than its parent.",
+    "== top level\n\
+    === low level\n",
+    "The heading hierarchy is consistent."
+    => LintKind::InconsistentHeadingHierarchy
 );
 
 
