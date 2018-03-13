@@ -74,10 +74,10 @@ macro_rules! rule_impl {
                 let tree_bad = parse(bad_input).unwrap();
                 let tree_good = parse(good_input).unwrap();
                 let settings = Settings::default();
-                let mut rule_bad = $t::default();
+                let mut rule_bad = $t::new();
                 let bad_lints = tree_bad.check(&mut rule_bad, &settings)
                     .expect("rule crashed!");
-                let mut rule_good = $t::default();
+                let mut rule_good = $t::new();
                 let good_lints = tree_good.check(&mut rule_good, &settings)
                     .expect("rule crashed!");
 
