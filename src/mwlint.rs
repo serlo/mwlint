@@ -54,7 +54,6 @@ fn main() {
     }
 
     let settings = Settings::default();
-    eprintln!("settings: {:?}", &settings);
 
     if dump_config {
         println!("{}", toml::to_string(&settings)

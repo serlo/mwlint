@@ -94,8 +94,8 @@ impl fmt::Display for Lint {
             Severity::Error => format!("ERROR: {} ({:?})", message, self.kind).red(),
         };
         writeln!(f, "{}", fancy.bold())?;
-        writeln!(f, "{}", self.explanation_long)?;
-        write!(f, "{} {}", "try:".green().bold(), self.solution)
+        writeln!(f, "{} {}", "try:".green().bold(), self.solution)?;
+        writeln!(f, "{}", self.explanation_long)
     }
 }
 

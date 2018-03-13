@@ -115,26 +115,59 @@ impl<'p> TreeChecker<'p> {
     }
 }
 
-macro_rules! template_spec {
-    ($($template:expr),*) => {
-        pub fn spec<'p>() -> Vec<TemplateSpec<'p>> {
-            vec![$($template),*]
-        }
+pub fn check_name(name: &[Element]) -> Option<&str> {
+    if name.len() != 1 {
+        return None
     }
+    match name.first() {
+        Some(&Element::Text { ref text, .. }) => return Some(text),
+        Some(&Element::Paragraph { ref content, .. }) => {
+            if content.len() != 1 {
+                return None
+            }
+            if let Some(&Element::Text { ref text, .. }) = content.first() {
+                return Some(text)
+            }
+        },
+        _ => (),
+    };
+    None
 }
 
-macro_rules! template {
-    (
-        name: $name:expr,
-        alt: [$($altname:expr),*],
-        format: $format:expr,
-        attributes: [$($attr:expr),*]
-    ) => {
-        TemplateSpec {
-            name: $name.into(),
-            alternative_names: vec![$($altname.into()),*],
-            format: $format,
-            attributes: vec![$($attr),*]
+macro_rules! template_spec {
+    ($(
+        template {
+            name: $name:expr,
+            alt: [$($altname:expr),*],
+            format: $format:expr,
+            attributes: [$($attr:expr),*]
+        }
+    ),*) => {
+        pub fn spec<'p>() -> Vec<TemplateSpec<'p>> {
+            vec![
+                $(
+                    TemplateSpec {
+                        name: $name.into(),
+                        alternative_names: vec![$($altname.into()),*],
+                        format: $format,
+                        attributes: vec![$($attr),*]
+                    }
+                ),*
+            ]
+        }
+
+        pub fn format(template: &Element) -> Option<Format> {
+            if let Element::Template { ref name, .. } = *template {
+                match check_name(name) {
+                    $(
+                        Some($name) => Some($format),
+                        $(Some($altname) => Some($format)),*
+                    ),*,
+                    _ => None
+                }
+            } else {
+                None
+            }
         }
     }
 }

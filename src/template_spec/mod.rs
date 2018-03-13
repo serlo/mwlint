@@ -1,18 +1,19 @@
 //! A sample template specification for "Mathe-für-Nicht-Freaks".
 
-mod predicates;
 #[macro_use]
 mod spec;
+mod predicates;
 
 use self::predicates::*;
 pub use self::spec::*;
+use mediawiki_parser::Element;
 
 pub use self::spec::{TemplateSpec};
 
 template_spec!(
-    template!(
+    template {
         name: "formula",
-        alt: ["formel"],
+        alt: ["formel", "Formel", "Formula"],
         format: Format::Inline,
         attributes: [
             attribute!(
@@ -22,6 +23,19 @@ template_spec!(
                 predicate: &is_math_tag
             )
         ]
-    )
+    },
+    template {
+        name: "important",
+        alt: ["-"],
+        format: Format::Block,
+        attributes: [
+            attribute!(
+                name: "1",
+                alt: ["content"],
+                priority: Priority::Required,
+                predicate: &is_text_only_paragraph
+            )
+        ]
+    }
 );
 

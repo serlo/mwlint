@@ -1,4 +1,5 @@
 use preamble::*;
+use template_spec::check_name;
 
 rule_impl!(CheckTemplates, "Checks for the correct use of templates."
 => examples:
@@ -137,25 +138,6 @@ fn illegal_content(
     }
 }
 
-fn check_name(name: &[Element]) -> Option<&str> {
-    if name.len() != 1 {
-        return None
-    }
-    match name.first() {
-        Some(&Element::Text { ref text, .. }) => return Some(text),
-        Some(&Element::Paragraph { ref content, .. }) => {
-            if content.len() != 1 {
-                return None
-            }
-            if let Some(&Element::Text { ref text, .. }) = content.first() {
-                return Some(text)
-            }
-        },
-        _ => (),
-    };
-    None
-}
-
 impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
 
     path_impl!();
@@ -221,6 +203,7 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
                                 ));
                                 exists = true;
                             }
+
                             if !exists {
                                 continue
                             }
@@ -238,7 +221,7 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
                     if !exists && attr.priority == Priority::Required {
                         self.push(missing_argument(
                             position,
-                            name
+                            &attr.name
                         ));
                     }
                 }
