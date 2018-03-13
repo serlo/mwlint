@@ -60,7 +60,7 @@ fn inconsistent_hierarchy_lint(
     }
 }
 
-impl<'e, 's> Traversion<'e, &'s Settings> for CheckHeadings<'e> {
+impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckHeadings<'e> {
 
     path_impl!();
 

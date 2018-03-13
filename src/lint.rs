@@ -32,6 +32,8 @@ pub enum LintKind {
     DefinitionWithoutTerm,
     ListOneElement,
     ListMixedType,
+    TemplateNotAllowed,
+    InvalidTemplateName,
 }
 
 /// Specifies examples for linter rules.

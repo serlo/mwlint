@@ -153,7 +153,7 @@ fn term_to_def(kind: &ListItemKind) -> ListItemKind {
     }
 }
 
-impl<'e, 's> Traversion<'e, &'s Settings> for CheckLists<'e> {
+impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckLists<'e> {
 
     path_impl!();
 

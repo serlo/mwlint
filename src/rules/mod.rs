@@ -4,9 +4,7 @@ use lint::*;
 //mod check_template_whitelist;
 mod check_headings;
 mod check_lists;
-
-pub use self::check_headings::*;
-pub use self::check_lists::*;
+mod check_templates;
 
 macro_rules! register {
     ($list:ident, $t1:tt :: $t2:tt) => {
@@ -21,7 +19,7 @@ pub fn get_rules<'e, 's: 'e>() -> RuleList<'e, 's> {
     let mut rules: RuleList<'e, 's> = vec![];
     register!(rules, check_headings::CheckHeadings);
     register!(rules, check_lists::CheckLists);
-    //register!(rules, check_template_whitelist::CheckTemplateWhitelist);
+    register!(rules, check_templates::CheckTemplates);
     rules
 }
 

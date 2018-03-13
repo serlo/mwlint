@@ -3,6 +3,8 @@ extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 extern crate colored;
+#[macro_use]
+extern crate lazy_static;
 
 
 /// Provides linter result definitions.
@@ -15,11 +17,7 @@ mod utils;
 /// Data structures for defining rules.
 #[macro_use]
 mod rule;
-/// Data structure for template specification.
-#[macro_use]
 mod template_spec;
-mod predicates;
-mod mfnf_templates;
 
 /// common imports for rules.
 mod preamble {

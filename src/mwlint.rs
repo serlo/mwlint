@@ -53,25 +53,15 @@ fn main() {
         ap.parse_args_or_exit();
     }
 
-    /*
-    let mut settings: mwlint::settings::Settings;
-
-    if !config_file.is_empty() {
-        let config_source = mediawiki_parser::util::read_file(&config_file);
-        settings = toml::from_str(&config_source)
-            .expect("Could not parse settings file!");
-    } else {
-        settings = Default::default();
-    }
-
-    settings.merge_rules(&mut mwlint::rules::get_rules());
+    let settings = Settings::default();
+    eprintln!("settings: {:?}", &settings);
 
     if dump_config {
         println!("{}", toml::to_string(&settings)
             .expect("Could serialize settings!"));
         process::exit(0);
     }
-    */
+
     let root: Element = (if !input_file.is_empty() {
         let file = fs::File::open(&input_file)
             .expect("Could not open input file!");
@@ -80,7 +70,7 @@ fn main() {
         serde_yaml::from_reader(io::stdin())
     }).expect("Could not parse input!");
 
-    let settings = Settings::default();
+
     let mut rules = get_rules();
     let mut lints = vec![];
 

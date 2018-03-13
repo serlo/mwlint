@@ -1,14 +1,17 @@
 use mediawiki_parser::*;
 use std::io;
+use std::fmt;
 
 /// Specifies wether a template represents a logical unit (`Block`)
 /// or simpler markup (`Inline`).
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum Format {
     Block,
     Inline
 }
 
 /// Template attributes can have different priorities.
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum Priority {
     Required,
     Optional
@@ -18,6 +21,7 @@ pub enum Priority {
 type Predicate = Fn(&Element) -> bool;
 
 /// Represents a (semantic) template.
+#[derive(Debug, Clone, Serialize)]
 pub struct TemplateSpec<'p> {
     pub name: String,
     pub alternative_names: Vec<String>,
@@ -26,17 +30,28 @@ pub struct TemplateSpec<'p> {
 }
 
 /// Represents an attribute (or argument) of a template.
+#[derive(Clone, Serialize)]
 pub struct Attribute<'p> {
     pub name: String,
     pub alternative_names: Vec<String>,
     pub priority: Priority,
+    #[serde(skip)]
     pub predicate: &'p Predicate,
     pub predicate_source: String,
 }
 
+impl<'p> fmt::Debug for Attribute<'p> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Attribute: {{ name: {:?}, alternative_names {:?}, \
+                   priority: {:?}, predicate: <predicate func>, \
+                   predicate_source: {:?} }}", self.name, self.alternative_names,
+                   self.priority, self.predicate_source)
+    }
+}
+
 /// Checks a predicate for a given input tree.
 #[derive(Default)]
-struct TreeChecker<'path> {
+pub struct TreeChecker<'path> {
     pub path: Vec<&'path Element>,
     pub result: bool,
 }
@@ -100,13 +115,9 @@ impl<'p> TreeChecker<'p> {
     }
 }
 
-pub fn true_for_subtree(root: &Element, predicate: &Predicate) -> bool {
-    true
-}
-
 macro_rules! template_spec {
     ($($template:expr),*) => {
-        fn specs<'p>() -> Vec<TemplateSpec<'p>> {
+        pub fn spec<'p>() -> Vec<TemplateSpec<'p>> {
             vec![$($template),*]
         }
     }

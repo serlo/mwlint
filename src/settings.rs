@@ -1,3 +1,4 @@
+use template_spec::{TemplateSpec, spec};
 
 /// Rule metadata.
 #[derive(Debug, Serialize, PartialEq, Clone, Deserialize)]
@@ -7,19 +8,20 @@ pub struct RuleMeta {
 }
 
 /// Settings for linter rules.
-#[derive(Debug, Serialize, PartialEq, Clone, Deserialize)]
-pub struct Settings {
+#[derive(Debug, Serialize, Clone, Deserialize)]
+pub struct Settings<'p> {
     /// Maximum allowed depth of a heading.
     pub max_heading_depth: usize,
-    /// A list of allowed template names. If empty, all templates are allowed.
-    pub template_whitelist: Vec<String>,
+    /// Specification of allowed templates.
+    #[serde(skip_deserializing)]
+    pub template_spec: Vec<TemplateSpec<'p>>,
 }
 
-impl Default for Settings {
+impl<'p> Default for Settings<'p> {
     fn default() -> Self {
         Settings {
             max_heading_depth: 4,
-            template_whitelist: vec![],
+            template_spec: spec::<'p>(),
         }
     }
 }

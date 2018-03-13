@@ -1,7 +1,13 @@
 //! A sample template specification for "Mathe-für-Nicht-Freaks".
 
-use predicates::*;
-use template_spec::*;
+mod predicates;
+#[macro_use]
+mod spec;
+
+use self::predicates::*;
+use self::spec::*;
+
+pub use self::spec::{TemplateSpec};
 
 template_spec!(
     template!(

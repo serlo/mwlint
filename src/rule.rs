@@ -5,7 +5,7 @@ use std::io;
 
 
 /// Linter rule trait.
-pub trait Rule<'e, 's: 'e>: Traversion<'e, &'s Settings> + 'e {
+pub trait Rule<'e, 's: 'e>: Traversion<'e, &'s Settings<'s>> + 'e {
     fn meta(&self) -> RuleMeta;
     fn push(&mut self, lint: Lint);
     fn lints(&self) -> &Vec<Lint>;
