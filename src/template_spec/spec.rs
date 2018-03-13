@@ -120,13 +120,13 @@ pub fn check_name(name: &[Element]) -> Option<&str> {
         return None
     }
     match name.first() {
-        Some(&Element::Text { ref text, .. }) => return Some(text),
+        Some(&Element::Text { ref text, .. }) => return Some(text.trim()),
         Some(&Element::Paragraph { ref content, .. }) => {
             if content.len() != 1 {
                 return None
             }
             if let Some(&Element::Text { ref text, .. }) = content.first() {
-                return Some(text)
+                return Some(text.trim())
             }
         },
         _ => (),
@@ -147,8 +147,8 @@ macro_rules! template_spec {
             vec![
                 $(
                     TemplateSpec {
-                        name: $name.into(),
-                        alternative_names: vec![$($altname.into()),*],
+                        name: $name.trim().into(),
+                        alternative_names: vec![$($altname.trim().into()),*],
                         format: $format,
                         attributes: vec![$($attr),*]
                     }
@@ -158,16 +158,19 @@ macro_rules! template_spec {
 
         pub fn format(template: &Element) -> Option<Format> {
             if let Element::Template { ref name, .. } = *template {
-                match check_name(name) {
+                let name = check_name(name);
+                $(
+                    if Some($name.trim()) == name {
+                        return Some($format);
+                    }
                     $(
-                        Some($name) => Some($format),
-                        $(Some($altname) => Some($format)),*
-                    ),*,
-                    _ => None
-                }
-            } else {
-                None
+                        if Some($altname.trim()) == name {
+                            return Some($format);
+                        }
+                    )*
+                )*
             }
+            None
         }
     }
 }
@@ -180,8 +183,8 @@ macro_rules! attribute {
         predicate: $predicate:expr
     ) => {
         Attribute {
-            name: $name.into(),
-            alternative_names: vec![$($altname.into()),*],
+            name: $name.trim().into(),
+            alternative_names: vec![$($altname.trim().into()),*],
             priority: $priority,
             predicate: $predicate,
             predicate_source: stringify!($predicate).into()
