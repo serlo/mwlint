@@ -5,7 +5,7 @@ mod predicates;
 mod spec;
 
 use self::predicates::*;
-use self::spec::*;
+pub use self::spec::*;
 
 pub use self::spec::{TemplateSpec};
 
@@ -17,7 +17,7 @@ template_spec!(
         attributes: [
             attribute!(
                 name: "1",
-                alt: [],
+                alt: ["formel"],
                 priority: Priority::Required,
                 predicate: &is_math_tag
             )

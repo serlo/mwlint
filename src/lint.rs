@@ -34,6 +34,11 @@ pub enum LintKind {
     ListMixedType,
     TemplateNotAllowed,
     InvalidTemplateName,
+    DeprecatedTemplateName,
+    InvalidArgumentName,
+    DeprecatedArgumentName,
+    MissingTemplateArgument,
+    IllegalArgumentContent,
 }
 
 /// Specifies examples for linter rules.

@@ -3,9 +3,6 @@ extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 extern crate colored;
-#[macro_use]
-extern crate lazy_static;
-
 
 /// Provides linter result definitions.
 mod lint;
@@ -26,6 +23,7 @@ mod preamble {
     pub use mediawiki_parser::*;
     pub use settings::{Settings, RuleMeta};
     pub use std::io;
+    pub use template_spec::{Priority};
 }
 
 /// The checking functions themselves.

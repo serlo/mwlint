@@ -18,7 +18,7 @@ pub enum Priority {
 }
 
 /// A function to determine wether a given element is allowed.
-type Predicate = Fn(&Element) -> bool;
+type Predicate = Fn(&[Element]) -> bool;
 
 /// Represents a (semantic) template.
 #[derive(Debug, Clone, Serialize)]
@@ -71,9 +71,9 @@ impl <'e, 'p: 'e> Traversion<'e, &'p CheckerSettings<'p>> for TreeChecker<'e> {
 
     path_methods!('e);
 
-    fn work(
+    fn work_vec(
         &mut self,
-        root: &Element,
+        root: &[Element],
         settings: &'p CheckerSettings<'p>,
         _: &mut io::Write
     ) -> io::Result<bool> {
@@ -86,30 +86,30 @@ impl <'e, 'p: 'e> Traversion<'e, &'p CheckerSettings<'p>> for TreeChecker<'e> {
 }
 
 impl<'p> TreeChecker<'p> {
-    pub fn all(root: &Element, predicate: &Predicate) -> bool {
+    pub fn all(root: &[Element], predicate: &Predicate) -> bool {
         let settings = CheckerSettings {
             predicate,
             mode: CheckerMode::All
         };
         let mut checker = TreeChecker::default();
         checker.result = true;
-        checker.run(&root, &settings, &mut vec![])
+        checker.run_vec(&root, &settings, &mut vec![])
             .expect("error checking predicate!");
         checker.result
     }
 
-    pub fn min_one(root: &Element, predicate: &Predicate) -> bool {
+    pub fn min_one(root: &[Element], predicate: &Predicate) -> bool {
         !TreeChecker::never(root, predicate)
     }
 
-    pub fn never(root: &Element, predicate: &Predicate) -> bool {
+    pub fn never(root: &[Element], predicate: &Predicate) -> bool {
         let settings = CheckerSettings {
             predicate,
             mode: CheckerMode::None
         };
         let mut checker = TreeChecker::default();
         checker.result = true;
-        checker.run(&root, &settings, &mut vec![])
+        checker.run_vec(&root, &settings, &mut vec![])
             .expect("error checking predicate!");
         checker.result
     }

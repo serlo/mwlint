@@ -6,6 +6,10 @@ mod check_headings;
 mod check_lists;
 mod check_templates;
 
+pub use self::check_headings::CheckHeadings;
+pub use self::check_lists::CheckLists;
+pub use self::check_templates::CheckTemplates;
+
 macro_rules! register {
     ($list:ident, $t1:tt :: $t2:tt) => {
         $list.push(Box::new($t1::$t2::new()));

@@ -2,8 +2,11 @@
 
 use mediawiki_parser::*;
 
-pub fn is_math_tag(elem: &Element) -> bool {
-    if let Element::Formatted { ref markup, .. } = *elem {
+pub fn is_math_tag(elems: &[Element]) -> bool {
+    if elems.len() != 1 {
+        return false
+    }
+    if let Some(&Element::Formatted { ref markup, .. }) = elems.first() {
         *markup == MarkupType::Math
     } else {
         false
