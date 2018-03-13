@@ -15,6 +15,11 @@ mod utils;
 /// Data structures for defining rules.
 #[macro_use]
 mod rule;
+/// Data structure for template specification.
+#[macro_use]
+mod template_spec;
+mod predicates;
+mod mfnf_templates;
 
 /// common imports for rules.
 mod preamble {
