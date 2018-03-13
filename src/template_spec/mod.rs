@@ -36,6 +36,25 @@ template_spec!(
                 predicate: &is_text_only_paragraph
             )
         ]
+    },
+    template {
+        name: "definition",
+        alt: [":Mathe für Nicht-Freaks: Vorlage:Definition"],
+        format: Format::Block,
+        attributes: [
+            attribute!(
+                name: "title",
+                alt: ["titel"],
+                priority: Priority::Required,
+                predicate: &is_text_only_paragraph
+            ),
+            attribute!(
+                name: "definition",
+                alt: [],
+                priority: Priority::Required,
+                predicate: &is_text_only_paragraph
+            )
+        ]
     }
 );
 
