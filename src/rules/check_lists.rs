@@ -121,8 +121,8 @@ fn list_one_element(
             But this list only contains one list element. Maybe some items are missing \
             or some other kind of markup should be used.".into(),
         solution:
-            "Either delete this list or think of its semantic purpose \
-            to find alternatives.".into(),
+            "Do you need a list here? For lists with longer paragraphs, \
+             use the `list`-template!".into(),
         severity: Severity::Info,
         kind: LintKind::ListOneElement,
     }
