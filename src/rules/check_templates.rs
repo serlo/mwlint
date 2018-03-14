@@ -39,6 +39,13 @@ rule_impl!(CheckTemplates, "Checks for the correct use of templates."
     "The required argument \"1\" is given."
     => LintKind::MissingTemplateArgument
 ;
+    illegal_argument_greeting,
+    "{{formula|<math>bla</math>|greeting=This is just normal text.}}",
+    "The formula template is called with wrong arguments, `greeting` does not belong to formula.",
+    "{{formula|<math>bla</math>}}",
+    "The first argument is a math formula."
+    => LintKind::IllegalArgument
+;
     illegal_formula_content,
     "{{formula|This is just normal text.}}",
     "A formula template must be given a math element.",
@@ -138,6 +145,24 @@ fn illegal_content(
     }
 }
 
+fn illegal_argument(
+    position: &Span,
+    argument_name: &str,
+    template_name: &str,
+    allowed: &[&str],
+) -> Lint {
+    Lint {
+        position: position.clone(),
+        explanation: format!("The argument {:?} is not allowed for {:?}",
+            argument_name, template_name),
+        explanation_long: format!(
+            "{:?} only allows the following arguments:\n{:?}", template_name, allowed),
+        solution: format!("Use one of the allowed template arguments."),
+        severity: Severity::Warning,
+        kind: LintKind::IllegalArgument,
+    }
+}
+
 impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
 
     path_impl!();
@@ -153,7 +178,7 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
             ref content
         } = *root {
 
-            let name = if let Some(text) = check_name(name) {
+            let template_name = if let Some(text) = check_name(name) {
                 text
             } else {
                 self.push(invalid_template_name(position));
@@ -162,14 +187,14 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
 
             let mut spec = None;
             for template in &settings.template_spec {
-                if template.name == name {
+                if template.name == template_name {
                     spec = Some(template);
                     break;
                 }
-                if template.alternative_names.contains(&name.to_string()) {
+                if template.alternative_names.contains(&template_name.to_string()) {
                     self.push(deprecated_name(
                         position,
-                        name,
+                        template_name,
                         &template.name,
                         "template",
                         LintKind::DeprecatedTemplateName
@@ -180,24 +205,24 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
             }
 
             if let Some(spec) = spec {
-                for attr in &spec.attributes {
+                for arg_spec in &spec.attributes {
 
                     let mut exists = false;
 
-                    for attribute in content {
+                    for argument in content {
                         if let Element::TemplateArgument {
                             ref position,
                             ref name,
                             ref value
-                        } = *attribute {
-                            if attr.name == *name {
+                        } = *argument {
+                            if arg_spec.name == *name {
                                 exists = true;
                             }
-                            if attr.alternative_names.contains(&name.to_string()) {
+                            if arg_spec.alternative_names.contains(&name.to_string()) {
                                 self.push(deprecated_name(
                                     position,
                                     name,
-                                    &attr.name,
+                                    &arg_spec.name,
                                     "argument",
                                     LintKind::DeprecatedArgumentName
                                 ));
@@ -208,26 +233,49 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
                                 continue
                             }
 
-                            if !(attr.predicate)(value) {
+                            if !(arg_spec.predicate)(value) {
                                 self.push(illegal_content(
                                     position,
                                     name,
-                                    &attr.predicate_source
+                                    &arg_spec.predicate_source
                                 ));
                             }
                             break;
                         }
                     }
-                    if !exists && attr.priority == Priority::Required {
+                    if !exists && arg_spec.priority == Priority::Required {
                         self.push(missing_argument(
                             position,
-                            &attr.name
+                            &arg_spec.name
                         ));
                     }
                 }
 
+                // find unspecified arguments
+                let allowed_args: Vec<&str>
+                    = spec.attributes.iter().map(|a| a.name.as_str()).collect();
+                for argument in content {
+                    if let Element::TemplateArgument { ref position, ref name, .. } = *argument {
+                        let mut has_spec = false;
+                        for arg_spec in &spec.attributes {
+                            if arg_spec.name == *name {
+                                has_spec = true;
+                                break;
+                            }
+                        }
+
+                        if !has_spec {
+                            self.push(illegal_argument(
+                                position,
+                                name,
+                                template_name,
+                                allowed_args.as_slice()
+                            ));
+                        }
+                    }
+                }
             } else {
-                self.push(template_not_allowed(position, name));
+                self.push(template_not_allowed(position, template_name));
             }
         }
         Ok(true)

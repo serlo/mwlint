@@ -38,6 +38,7 @@ pub enum LintKind {
     InvalidArgumentName,
     DeprecatedArgumentName,
     MissingTemplateArgument,
+    IllegalArgument,
     IllegalArgumentContent,
 }
 
