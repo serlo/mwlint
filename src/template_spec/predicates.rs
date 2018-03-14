@@ -30,7 +30,6 @@ pub fn is_text_only_paragraph(elems: &[Element]) -> bool {
                 | Element::TableRow { .. }
                 | Element::TableCell { .. }
                 | Element::InternalReference { .. }
-                | Element::ListItem { .. }
                 => return false,
                 _ => (),
             }
