@@ -215,10 +215,10 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
                             ref name,
                             ref value
                         } = *argument {
-                            if arg_spec.name == *name {
+                            if arg_spec.name == *name.trim() {
                                 exists = true;
                             }
-                            if arg_spec.alternative_names.contains(&name.to_string()) {
+                            if arg_spec.alternative_names.contains(&name.trim().to_string()) {
                                 self.push(deprecated_name(
                                     position,
                                     name,
@@ -258,7 +258,8 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
                     if let Element::TemplateArgument { ref position, ref name, .. } = *argument {
                         let mut has_spec = false;
                         for arg_spec in &spec.attributes {
-                            if arg_spec.name == *name {
+                            if arg_spec.name == *name.trim()
+                            || arg_spec.alternative_names.contains(&name.trim().to_string()) {
                                 has_spec = true;
                                 break;
                             }
