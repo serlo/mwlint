@@ -57,6 +57,25 @@ template_spec!(
         ]
     },
     template {
+        name: "theorem",
+        alt: [":Mathe für Nicht-Freaks: Vorlage:Satz"],
+        format: Format::Block,
+        attributes: [
+            attribute!(
+                name: "title",
+                alt: ["titel"],
+                priority: Priority::Required,
+                predicate: &is_text_only_paragraph
+            ),
+            attribute!(
+                name: "theorem",
+                alt: ["satz"],
+                priority: Priority::Required,
+                predicate: &is_text_only_paragraph
+            )
+        ]
+    },
+    template {
         name: "example",
         alt: [":Mathe für Nicht-Freaks: Vorlage:Beispiel"],
         format: Format::Block,
