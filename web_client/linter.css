@@ -15,10 +15,6 @@ body {
     height: 600px;
 }
 
-#result {
-    width: 200px;
-}
-
 .lint {
     border: 1px;
     border-style: solid;

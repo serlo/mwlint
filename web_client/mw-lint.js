@@ -37,7 +37,7 @@ CodeMirror.registerHelper("lint", "markdown", function(text, options) {
   for ( var i = 0; i < last_lints.length; i++) {
     var lint = last_lints[i];
     var severity = lint.severity;
-    console.log(lint);
+
     found.push({
       from: CodeMirror.Pos(lint.position.start.line - 1, lint.position.start.col - 1),
       to: CodeMirror.Pos(lint.position.end.line - 1, lint.position.end.col - 1),
