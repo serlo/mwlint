@@ -6,7 +6,6 @@
         <link rel="stylesheet" type="text/css" href="codemirror.css">
         <link rel="stylesheet" type="text/css" href="linter.css">
         <link rel="stylesheet" type="text/css" href="lint.css">
-        <script src="jquery-3.3.1.min.js"></script>
         <script src="codemirror.js"></script>
         <script src="markdown.js"></script>
         <script src="active-line.js"></script>
@@ -18,92 +17,81 @@
             var base = "http://localhost:8000/";
             var last_lints = [];
 
-            function output_parse_error(err, out) {
-                out.append(
-                    "The submitted document contains a syntax error at " +
-                    err.position.line + ":" + err.position.col + "!<br>"
-                );
-                out.append(
-                    "<div class=\"expected\">Expected one of: " +
-                    err.expected.join(", ") + "</div><br>"
-                );
-                out.append("<div class=\"context\">" +
-                    err.context.join("<br>") + "</div>"
-                );
-            };
-
-            function output_trans_error(err, out) {
-                 out.append(
-                    "The transformation \"" + err.transformation_name + "\" failed. " +
-                    "The error occured with the element at " + err.position.start.line + ":" +
-                    err.position.start.col + " to " + err.position.end.line + ":" + 
-                    err.position.end.col + "!<br>"
-                );
-                out.append(
-                    "<div class=\"err_cause\">" + err.cause + "</div>"
-                );  
+            function escapeHtml(unsafe) {
+                return unsafe
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
             }
 
-            function output_lint(lint, out, index) {
-                out.append(
-                    "<div class=\"lint lint-" + lint.severity + "\" id=\"lint" 
-                    + index + "\"></div>"
-                );
-                var out = $("#lint" + index);
-                out.append(
-                    "<div class=\"explanation\">" + lint.explanation + "</div>"
-                );
-                out.append(
-                    "<div class=\"solution\">" + lint.solution + "</div>"
-                );
-                out.append(
-                    "<div class=\"explanation_long\">" + lint.explanation_long + "</div>"
-                );
-                out.append(
-                    "<div class=\"lint_kind\">" + lint.kind + "</div>"
-                );
+            function build_parse_lint(err) {
+                var expected = escapeHtml(err.expected.join(", "));
+                return {
+                    position: {
+                        start: {
+                            line: err.position.line,
+                            col: err.position.col,
+                        },
+                        end: {
+                            line: err.position.line,
+                            col: err.position.col,
+                        }
+                    },
+                    severity: "error",
+                    explanation_long: "A syntax error occurs when there are mistakes in your code which make it impossible for analyse you document. These are often missing closing brackets and the likes. Also check the surrounding code, as the mistake might have happend before or after the given position.",
+                    explanation: "Syntax error!",
+                    solution: "Expected one of: " + expected,
+                };
+            }
+
+            function build_transformation_lint(err) {
+                return {
+                    severity: "error",
+                    explanation_long: "A transformation error occurs when a document could not be properly processed after parsing. This can occur if you have a peculiar heading or list structure.",
+                    explanation: err.cause,
+                    position: err.position,
+                    solution: "somehow this document does not conform with the usual document structure...",
+                };
             }
 
             function fetch_lints(source) {
-                $.ajax({url: base, data: { source: source }, type: "POST", 
-                success: function(result) {
-                    var out = $("#results");
-                    out.empty();
-                    // errors
-                    if (result.hasOwnProperty("Error")) {
-                        // transformation error 
-                        out.append("<div class=\"error_container\" id=\"error_container\"></div>");
-                        var out = $("#error_container");
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        var result = JSON.parse(this.responseText);
+                        // errors
+                        if (result.hasOwnProperty("Error")) {
 
-                        if (result.Error.hasOwnProperty("parseerror")) {
-                            var err = result.Error.parseerror;                            
-                            output_parse_error(err, out);
+                            // parse error
+                            if (result.Error.hasOwnProperty("parseerror")) {
+                                var lint = build_parse_lint(result.Error.parseerror);
+                                last_lints = [lint]; 
+                            }
+
+                            // transformation errors
+                            if (result.Error.hasOwnProperty("transformationerror")) {
+                                var lint = build_transformation_lint(
+                                    result.Error.transformationerror
+                                );
+                                last_lints = [lint]
+                            }
                         }
-
-                        // transformation errors
-                        if (result.Error.hasOwnProperty("transformationerror")) {
-                            var err = result.Error.transformationerror;
-                            output_trans_error(err, out); 
-                        } 
-                    }
-                    
-                    // lints
-                    if (result.hasOwnProperty("Lints")) {
-                        last_lints = result.Lints;
-                        for (var index=0; index<result.Lints.length; index++) {
-                            output_lint(result.Lints[index], out, index);
+                        
+                        // lints
+                        if (result.hasOwnProperty("Lints")) {
+                            last_lints = result.Lints;
                         }
                     }
-                },
-                error: function(result) {
-                    alert("An error occured: " + result.status + " " + result.statusText);
-                    console.log(result);
-                }
-                }); 
-            }; 
+                };
+                xhttp.open("POST", base, true);
+                xhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+                xhttp.send("source=" + encodeURIComponent(source)); 
+            }
 
             function submit_source() {
-                var source = editor.getValue("\n");
+                var source = editor.getValue("\n") + "\n";
                 fetch_lints(source);
             };
             

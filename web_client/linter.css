@@ -36,6 +36,7 @@ body {
 
 .explanation_long {
     color: grey;
+    font-size: small;
 }
 
 .lint-info {
