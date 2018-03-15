@@ -8,8 +8,19 @@ name = "mwlint"
 path = "src/mwlint.rs"
 doc = false
 
+[[bin]]
+name = "mwlint_web"
+path = "src/web/mod.rs"
+required-features = ["web"]
+
+[features]
+web = ["rocket", "rocket_codegen", "rocket_contrib"]
+
 [dependencies]
 mediawiki_parser = { git = "https://github.com/vroland/mediawiki-peg-rust.git" }
+rocket = { version = "0.3", optional = true }
+rocket_codegen = { version = "0.3", optional = true }
+rocket_contrib = { version = "0.3", optional = true } 
 serde = "1.0"
 serde_derive = "1.0"
 serde_yaml = "0.7"
@@ -17,3 +28,4 @@ colored = "1.6"
 argparse = "0.2"
 toml = "0.4"
 rayon = "0.9"
+

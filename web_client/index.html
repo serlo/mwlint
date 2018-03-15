@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+
+<html> 
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="codemirror.css">
+        <link rel="stylesheet" type="text/css" href="linter.css">
+        <link rel="stylesheet" type="text/css" href="lint.css">
+        <script src="jquery-3.3.1.min.js"></script>
+        <script src="codemirror.js"></script>
+        <script src="markdown.js"></script>
+        <script src="active-line.js"></script>
+        <script src="matchbrackets.js"></script>
+        <script src="lint.js"></script>
+        <script src="mw-lint.js"></script>
+
+        <script type="text/javascript">
+            var base = "http://localhost:8000/";
+            var last_lints = [];
+
+            function output_parse_error(err, out) {
+                out.append(
+                    "The submitted document contains a syntax error at " +
+                    err.position.line + ":" + err.position.col + "!<br>"
+                );
+                out.append(
+                    "<div class=\"expected\">Expected one of: " +
+                    err.expected.join(", ") + "</div><br>"
+                );
+                out.append("<div class=\"context\">" +
+                    err.context.join("<br>") + "</div>"
+                );
+            };
+
+            function output_trans_error(err, out) {
+                 out.append(
+                    "The transformation \"" + err.transformation_name + "\" failed. " +
+                    "The error occured with the element at " + err.position.start.line + ":" +
+                    err.position.start.col + " to " + err.position.end.line + ":" + 
+                    err.position.end.col + "!<br>"
+                );
+                out.append(
+                    "<div class=\"err_cause\">" + err.cause + "</div>"
+                );  
+            }
+
+            function output_lint(lint, out, index) {
+                out.append(
+                    "<div class=\"lint lint-" + lint.severity + "\" id=\"lint" 
+                    + index + "\"></div>"
+                );
+                var out = $("#lint" + index);
+                out.append(
+                    "<div class=\"explanation\">" + lint.explanation + "</div>"
+                );
+                out.append(
+                    "<div class=\"solution\">" + lint.solution + "</div>"
+                );
+                out.append(
+                    "<div class=\"explanation_long\">" + lint.explanation_long + "</div>"
+                );
+                out.append(
+                    "<div class=\"lint_kind\">" + lint.kind + "</div>"
+                );
+            }
+
+            function fetch_lints(source) {
+                $.ajax({url: base, data: { source: source }, type: "POST", 
+                success: function(result) {
+                    var out = $("#results");
+                    out.empty();
+                    // errors
+                    if (result.hasOwnProperty("Error")) {
+                        // transformation error 
+                        out.append("<div class=\"error_container\" id=\"error_container\"></div>");
+                        var out = $("#error_container");
+
+                        if (result.Error.hasOwnProperty("parseerror")) {
+                            var err = result.Error.parseerror;                            
+                            output_parse_error(err, out);
+                        }
+
+                        // transformation errors
+                        if (result.Error.hasOwnProperty("transformationerror")) {
+                            var err = result.Error.transformationerror;
+                            output_trans_error(err, out); 
+                        } 
+                    }
+                    
+                    // lints
+                    if (result.hasOwnProperty("Lints")) {
+                        last_lints = result.Lints;
+                        for (var index=0; index<result.Lints.length; index++) {
+                            output_lint(result.Lints[index], out, index);
+                        }
+                    }
+                },
+                error: function(result) {
+                    alert("An error occured: " + result.status + " " + result.statusText);
+                    console.log(result);
+                }
+                }); 
+            }; 
+
+            function submit_source() {
+                var source = editor.getValue("\n");
+                fetch_lints(source);
+            };
+            
+            
+        </script>
+        <title>MFNF-Linter</title> 
+    </head>
+    <body>
+        <h1>Submit to linter</h1>
+        <button onclick="submit_source()">Force Lints</button>
+        <div id="content_div">
+            <textarea id="source_input"></textarea> 
+        </div>
+        <div id="results">Bla..!</div>
+        <script>
+            var editor = CodeMirror.fromTextArea(document.getElementById("source_input"), {
+                lineNumbers: true,
+                styleActiveLine: true,
+                matchBrackets: true,
+                gutters: ["CodeMirror-lint-markers"],
+                lint: true,
+                mode: {name: "markdown"},
+                viewportMargin: Infinity,
+            });
+            editor.on("changes", submit_source);
+        </script>
+    </body>
+</html>
