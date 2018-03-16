@@ -100,14 +100,14 @@
         <title>MFNF-Linter</title> 
     </head>
     <body>
-        <h1>Submit to linter</h1>
-        <button onclick="submit_source()">Force Lints</button>
         <div id="content_div">
             <textarea id="source_input"></textarea> 
         </div>
         <script>
             var editor = CodeMirror.fromTextArea(document.getElementById("source_input"), {
                 lineNumbers: true,
+                lineWrapping: true,
+                autofocus: true,
                 styleActiveLine: true,
                 matchBrackets: true,
                 gutters: ["CodeMirror-lint-markers"],
@@ -117,5 +117,6 @@
             });
             editor.on("changes", submit_source);
         </script>
+        <button onclick="submit_source()">Force Lints</button>
     </body>
 </html>
