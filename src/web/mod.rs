@@ -24,7 +24,8 @@ use rocket::request::Request;
 
 #[get("/")]
 fn index() -> &'static str {
-    "no GET endpoints available -> docs"
+    "no GET endpoints available. Use POST to send mediawiki source code. \
+    see https://github.com/vroland/mwlint."
 }
 
 #[derive(FromForm)]
@@ -82,5 +83,6 @@ fn lint(source_form: Form<SourceForm>) -> Json<ResultKind> {
 fn main() {
     rocket::ignite()
         .mount("/", routes![lint, index])
+        .mount("/mwlint", routes![lint, index])
         .launch();
 }
