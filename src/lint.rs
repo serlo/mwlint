@@ -40,6 +40,10 @@ pub enum LintKind {
     MissingTemplateArgument,
     IllegalArgument,
     IllegalArgumentContent,
+    MathSyntaxError,
+    MathLexingError,
+    MathUnknownFunction,
+    MathUnknownError,
 }
 
 /// Specifies examples for linter rules.

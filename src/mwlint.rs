@@ -24,6 +24,7 @@ fn main() {
     let mut dump_config = false;
     let mut input_file = "".to_string();
     let mut config_file = "".to_string();
+    let mut texvccheck_path = "./texvccheck".to_string();
     {
         let mut ap = ArgumentParser::new();
         ap.set_description(DESCRIPTION!());
@@ -50,16 +51,24 @@ fn main() {
             Store,
             "A config file to override the default options."
         );
+        ap.refer(&mut texvccheck_path).add_option(
+            &["-t", "--texvccheck"],
+            Store,
+            "Path to the texvccheck binary."
+        );
+
         ap.parse_args_or_exit();
     }
 
-    let settings = Settings::default();
+    let mut settings = Settings::default();
 
     if dump_config {
         println!("{}", toml::to_string(&settings)
             .expect("Could serialize settings!"));
         process::exit(0);
     }
+
+    settings.texvccheck_path = texvccheck_path;
 
     let root: Element = (if !input_file.is_empty() {
         let file = fs::File::open(&input_file)

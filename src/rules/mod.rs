@@ -5,10 +5,12 @@ use lint::*;
 mod check_headings;
 mod check_lists;
 mod check_templates;
+mod check_formulas;
 
 pub use self::check_headings::CheckHeadings;
 pub use self::check_lists::CheckLists;
 pub use self::check_templates::CheckTemplates;
+pub use self::check_formulas::CheckFormulas;
 
 macro_rules! register {
     ($list:ident, $t1:tt :: $t2:tt) => {
@@ -24,6 +26,7 @@ pub fn get_rules<'e, 's: 'e>() -> RuleList<'e, 's> {
     register!(rules, check_headings::CheckHeadings);
     register!(rules, check_lists::CheckLists);
     register!(rules, check_templates::CheckTemplates);
+    register!(rules, check_formulas::CheckFormulas);
     rules
 }
 
