@@ -67,7 +67,8 @@ fn lint(source_form: Form<SourceForm>) -> Json<ResultKind> {
         Err(mwerror) => return Json(ResultKind::Error(mwerror)),
     };
 
-    let settings = Settings::default();
+    let mut settings = Settings::default();
+    settings.texvccheck_path = "".to_string();
     let mut rules = get_rules();
     let mut lints = vec![];
 
