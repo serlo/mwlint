@@ -1,5 +1,3 @@
-var last_lints = [];
-
 if (document.getElementById("wpTextbox1") != null) {
 	$.getScript('https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/codemirror.min.js', function() {
 		console.log("codemirror loading...");
@@ -63,44 +61,46 @@ function init_editor() {
 	}
 	
 	function fetch_lints(source) {
-	    var xhttp = new XMLHttpRequest();
-	    xhttp.onreadystatechange = function() {
-	        if (this.readyState == 4 && this.status == 200) {
-	            var result = JSON.parse(this.responseText);
-	            // errors
-	            if (result.hasOwnProperty("Error")) {
-	
-	                // parse error
-	                if (result.Error.hasOwnProperty("parseerror")) {
-	                    var lint = build_parse_lint(result.Error.parseerror);
-	                    last_lints = [lint]; 
-	                }
-	
-	                // transformation errors
-	                if (result.Error.hasOwnProperty("transformationerror")) {
-	                    var lint = build_transformation_lint(
-	                        result.Error.transformationerror
-	                    );
-	                    last_lints = [lint]
-	                }
-	            }
-	            
-	            // lints
-	            if (result.hasOwnProperty("Lints")) {
-	                last_lints = result.Lints;
-	            }
-	        }
-	    };
-	    xhttp.open("POST", base, true);
-	    xhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-	    xhttp.send("source=" + encodeURIComponent(source)); 
+        return new Promise(function(resolve, reject){
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    var last_lints;
+                    var result = JSON.parse(this.responseText);
+                    // errors
+                    if (result.hasOwnProperty("Error")) {
+        
+                        // parse error
+                        if (result.Error.hasOwnProperty("parseerror")) {
+                            var lint = build_parse_lint(result.Error.parseerror);
+                            last_lints = [lint]; 
+                        }
+        
+                        // transformation errors
+                        if (result.Error.hasOwnProperty("transformationerror")) {
+                            var lint = build_transformation_lint(
+                                result.Error.transformationerror
+                            );
+                            last_lints = [lint]
+                        }
+                    }
+                    
+                    // lints
+                    if (result.hasOwnProperty("Lints")) {
+                        last_lints = result.Lints;
+                    }
+
+                    resolve(last_lints);
+                }
+                if (this.readyState == 4 && this.status != 200) {
+                    reject([]);
+                }
+            };
+            xhttp.open("POST", base, true);
+            xhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+            xhttp.send("source=" + encodeURIComponent(source)); 
+        });
 	}
-	
-	function submit_source() {
-	    var source = codeMirror.getValue("\n") + "\n";
-	    fetch_lints(source);
-	};
-			
 
 	codeMirror = CodeMirror.fromTextArea(document.getElementById("wpTextbox1"), {
 		lineNumbers: true,
@@ -113,69 +113,59 @@ function init_editor() {
 		mode: {name: "markdown"},
 		viewportMargin: Infinity,
 	});	
-	codeMirror.on("changes", submit_source);
-	console.log(codeMirror);
 
-	submit_source();
+    function register_mfnf_extensions() { 
+       
+        // CodeMirror, copyright (c) by Marijn Haverbeke and others
+        // Distributed under an MIT license: http://codemirror.net/LICENSE
+        // Modified by Valentin Roland
+        
+        (function(mod) {
+        if (typeof exports == "object" && typeof module == "object") // CommonJS
+            mod(require("../../lib/codemirror"));
+        else if (typeof define == "function" && define.amd) // AMD
+            define(["../../lib/codemirror"], mod);
+        else // Plain browser env
+            mod(CodeMirror);
+        })(function(CodeMirror) {
+           "use strict";
+        
+            function cmp_severity(a, b) {
+                var values = {
+                    info: 10,
+                    warning: 20,
+                    error: 30
+                };
+                return values[b.severity] - values[a.severity];
+            }
+            
+            CodeMirror.registerHelper("lint", "markdown", function(text, options) {
+                return new Promise(function(resolve, reject){
+                    var source = text.replace(/\n\r/g, "\n");
+                    fetch_lints(source).then(function(lints){
+                        var found = [];
+                        lints.sort(cmp_severity); 
+                        for ( var i = 0; i < lints.length; i++) {
+                            var lint = lints[i];
+                            var severity = lint.severity;
+                        
+                            found.push({
+                                from: CodeMirror.Pos(lint.position.start.line - 1, lint.position.start.col - 1),
+                                to: CodeMirror.Pos(lint.position.end.line - 1, lint.position.end.col - 1),
+                                messageHTML: "<span class=\"explanation explanation-" + lint.severity + 
+                                    "\">" + lint.explanation + "</span>" + 
+                                    "<br><span class=\"solution\">" + lint.solution + "</span>" + 
+                                    "<br><span class=\"explanation_long\">" + lint.explanation_long + "</span>",
+                                severity : severity
+                            });
+                        }
+                        resolve(found);
+                    }, function() {
+                        console.err("last lints is undefined, can't show lints in editor!");
+                        reject([]);
+                    });
+                });
+            });
+        });	
+    };
 }
-
-
-function register_mfnf_extensions() {
-	
-
-	// mw-lint.js
-	
-	// CodeMirror, copyright (c) by Marijn Haverbeke and others
-	// Distributed under an MIT license: http://codemirror.net/LICENSE
-	// Modified by Valentin Roland
-	
-	(function(mod) {
-	  if (typeof exports == "object" && typeof module == "object") // CommonJS
-	    mod(require("../../lib/codemirror"));
-	  else if (typeof define == "function" && define.amd) // AMD
-	    define(["../../lib/codemirror"], mod);
-	  else // Plain browser env
-	    mod(CodeMirror);
-	})(function(CodeMirror) {
-	"use strict";
-	
-	function cmp_severity(a, b) {
-	    var values = {
-	        info: 10,
-	        warning: 20,
-	        error: 30
-	    };
-	    return values[b.severity] - values[a.severity];
-	}
-	
-	CodeMirror.registerHelper("lint", "markdown", function(text, options) {
-	  var found = [];
-	  
-	  if (last_lints === null || last_lints === undefined) {
-	    console.run("last lints is undefined, can't show lints in editor!");
-	    return found;
-	  }
-
-	  last_lints.sort(cmp_severity);
-	
-	  for ( var i = 0; i < last_lints.length; i++) {
-	    var lint = last_lints[i];
-	    var severity = lint.severity;
-	
-	    found.push({
-	      from: CodeMirror.Pos(lint.position.start.line - 1, lint.position.start.col - 1),
-	      to: CodeMirror.Pos(lint.position.end.line - 1, lint.position.end.col - 1),
-	      messageHTML: "<span class=\"explanation explanation-" + lint.severity + 
-	        "\">" + lint.explanation + "</span>" + 
-	        "<br><span class=\"solution\">" + lint.solution + "</span>" + 
-	        "<br><span class=\"explanation_long\">" + lint.explanation_long + "</span>",
-	      severity : severity
-	    });
-	  }
-
-	  return found;
-	});
-	
-	});	
-};
-
