@@ -1,4 +1,4 @@
-use template_spec::{TemplateSpec, spec};
+use mfnf_commons::{TemplateSpec, spec, TemplateID};
 
 /// Rule metadata.
 #[derive(Debug, Serialize, PartialEq, Clone, Deserialize)]
@@ -16,7 +16,7 @@ pub struct Settings<'p> {
     pub texvccheck_path: String,
     /// Specification of allowed templates.
     #[serde(skip_deserializing)]
-    pub template_spec: Vec<TemplateSpec<'p>>,
+    pub template_spec: Vec<TemplateSpec<'p, TemplateID>>,
 }
 
 impl<'p> Default for Settings<'p> {

@@ -1,4 +1,5 @@
 extern crate mediawiki_parser;
+extern crate mfnf_commons;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
@@ -8,13 +9,9 @@ extern crate colored;
 mod lint;
 /// Structures for configuration of linter behaviour.
 mod settings;
-/// Various helper functions.
-#[macro_use]
-mod utils;
 /// Data structures for defining rules.
 #[macro_use]
 mod rule;
-mod template_spec;
 
 /// common imports for rules.
 mod preamble {
@@ -23,7 +20,7 @@ mod preamble {
     pub use mediawiki_parser::*;
     pub use settings::{Settings, RuleMeta};
     pub use std::io;
-    pub use template_spec::{Priority};
+    pub use mfnf_commons::util::*;
 }
 
 /// The checking functions themselves.

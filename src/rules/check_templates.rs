@@ -1,5 +1,5 @@
 use preamble::*;
-use template_spec::check_name;
+use mfnf_commons::*;
 
 rule_impl!(CheckTemplates, "Checks for the correct use of templates."
 => examples:
@@ -169,7 +169,7 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
 
     fn work(&mut self,
             root: &'e Element,
-            settings: &Settings,
+            _: &Settings,
             _: &mut io::Write) -> io::Result<bool> {
 
         if let Element::Template {
@@ -178,105 +178,99 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
             ref content
         } = *root {
 
-            let template_name = if let Some(text) = check_name(name) {
-                text
-            } else {
+            if !is_plain_text(name) {
                 self.push(invalid_template_name(position));
-                return Ok(true)
-            };
+            }
 
-            let mut spec = None;
-            for template in &settings.template_spec {
-                if template.name == template_name {
-                    spec = Some(template);
-                    break;
-                }
-                if template.alternative_names.contains(&template_name.to_string()) {
-                    self.push(deprecated_name(
+            let template_name = extract_plain_text(name).trim().to_lowercase();
+
+            if let Some(template_spec) = spec_of(&template_name) {
+                let parsed = parse_template(root)
+                    .expect(&format!("spec_of succeded but \
+                        template parsing failed for {}!", template_name));
+
+                let default_name = template_spec.default_name().trim().to_lowercase();
+                if template_name != default_name {
+                     self.push(deprecated_name(
                         position,
-                        template_name,
-                        &template.name,
+                        &template_name,
+                        &default_name,
                         "template",
                         LintKind::DeprecatedTemplateName
                     ));
-                    spec = Some(template);
-                    break;
                 }
-            }
 
-            if let Some(spec) = spec {
-                for arg_spec in &spec.attributes {
+                let present = parsed.present();
+                for arg_spec in &template_spec.attributes {
 
-                    let mut exists = false;
+                    let default_argname = arg_spec.default_name()
+                        .trim().to_lowercase();
+                    let exists = present.iter().fold(false,
+                        |acc, a| acc || arg_spec.names.contains(&a.name));
 
-                    for argument in content {
-                        if let Element::TemplateArgument {
-                            ref position,
-                            ref name,
-                            ref value
-                        } = *argument {
-                            if arg_spec.name == *name.trim() {
-                                exists = true;
-                            }
-                            if arg_spec.alternative_names.contains(&name.trim().to_string()) {
-                                self.push(deprecated_name(
-                                    position,
-                                    name,
-                                    &arg_spec.name,
-                                    "argument",
-                                    LintKind::DeprecatedArgumentName
-                                ));
-                                exists = true;
-                            }
-
-                            if !exists {
-                                continue
-                            }
-
-                            if !(arg_spec.predicate)(value) {
-                                self.push(illegal_content(
-                                    position,
-                                    name,
-                                    &arg_spec.predicate_source
-                                ));
-                            }
-                            break;
-                        }
-                    }
-                    if !exists && arg_spec.priority == Priority::Required {
+                     if !exists && arg_spec.priority == Priority::Required {
                         self.push(missing_argument(
                             position,
-                            &arg_spec.name
+                            &default_argname
                         ));
+                    }
+
+                    if let Some(&Element::TemplateArgument {
+                        ref position,
+                        ref name,
+                        ref value,
+                        ..
+                    }) = find_arg(content, &arg_spec.names) {
+                        let actual_name = name;
+
+                        if actual_name != &default_argname {
+                            self.push(deprecated_name(
+                                position,
+                                actual_name,
+                                &default_argname,
+                                "argument",
+                                LintKind::DeprecatedArgumentName
+                            ));
+                        }
+
+                        if !(arg_spec.predicate)(value) {
+                            self.push(illegal_content(
+                                position,
+                                actual_name,
+                                &arg_spec.predicate_source
+                            ));
+                        }
                     }
                 }
 
                 // find unspecified arguments
                 let allowed_args: Vec<&str>
-                    = spec.attributes.iter().map(|a| a.name.as_str()).collect();
+                    = template_spec.attributes.iter()
+                        .map(|a| a.default_name()).collect();
+
                 for argument in content {
-                    if let Element::TemplateArgument { ref position, ref name, .. } = *argument {
-                        let mut has_spec = false;
-                        for arg_spec in &spec.attributes {
-                            if arg_spec.name == *name.trim()
-                            || arg_spec.alternative_names.contains(&name.trim().to_string()) {
-                                has_spec = true;
-                                break;
-                            }
-                        }
+                    if let Element::TemplateArgument {
+                        ref position,
+                        ref name,
+                        ..
+                    } = *argument {
+                        let name = name.trim().to_lowercase();
+                        let has_spec = template_spec.attributes.iter()
+                            .fold(false, |acc, arg_spec|
+                                acc || arg_spec.names.contains(&name));
 
                         if !has_spec {
                             self.push(illegal_argument(
                                 position,
-                                name,
-                                template_name,
+                                &name,
+                                &template_name,
                                 allowed_args.as_slice()
                             ));
                         }
                     }
                 }
             } else {
-                self.push(template_not_allowed(position, template_name));
+                self.push(template_not_allowed(position, &template_name));
             }
         }
         Ok(true)
