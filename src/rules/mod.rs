@@ -1,7 +1,6 @@
 use rule::*;
-use lint::*;
+use lint::{Example, LintKind};
 
-//mod check_template_whitelist;
 mod check_headings;
 mod check_lists;
 mod check_templates;

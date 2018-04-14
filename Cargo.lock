@@ -247,11 +247,25 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "mfnf_commons"
 version = "0.1.0"
-source = "git+https://github.com/vroland/mfnf-export.git#f7b4a1b89ded6dd34bf195dc53085431cca64b02"
+source = "git+https://github.com/vroland/mfnf-export.git#d08d6a720efdf06639df22aa52618194df6c39c1"
 dependencies = [
  "mediawiki_parser 0.1.0 (git+https://github.com/vroland/mediawiki-peg-rust.git)",
+ "mfnf_derive 0.1.0 (git+https://github.com/vroland/mfnf-export.git)",
  "serde 1.0.37 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.37 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "mfnf_derive"
+version = "0.1.0"
+source = "git+https://github.com/vroland/mfnf-export.git#d08d6a720efdf06639df22aa52618194df6c39c1"
+dependencies = [
+ "proc-macro2 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "quote 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde 1.0.37 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde_derive 1.0.37 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde_yaml 0.7.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "syn 0.13.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -678,6 +692,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum memchr 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)" = "148fab2e51b4f1cfc66da2a7c32981d1d3c083a803978268bb11fe4b86925e7a"
 "checksum memoffset 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "0f9dc261e2b62d7a622bf416ea3c5245cdd5d9a7fcc428c0d06804dfce1775b3"
 "checksum mfnf_commons 0.1.0 (git+https://github.com/vroland/mfnf-export.git)" = "<none>"
+"checksum mfnf_derive 0.1.0 (git+https://github.com/vroland/mfnf-export.git)" = "<none>"
 "checksum mime 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)" = "ba626b8a6de5da682e1caa06bdb42a335aee5a84db8e5046a3e8ab17ba0a3ae0"
 "checksum nodrop 0.1.12 (registry+https://github.com/rust-lang/crates.io-index)" = "9a2228dca57108069a5262f2ed8bd2e82496d2e074a06d1ccc7ce1687b6ae0a2"
 "checksum num-traits 0.1.43 (registry+https://github.com/rust-lang/crates.io-index)" = "92e5113e9fd4cc14ded8e499429f396a20f98c772a47cc8622a736e1ec843c31"

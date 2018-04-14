@@ -1,5 +1,6 @@
 use preamble::*;
 use std::process::{Command};
+use lint::{Example, Lint};
 
 rule_impl!(CheckFormulas, "Verify math formulas."
 => examples:

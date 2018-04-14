@@ -1,5 +1,5 @@
 use preamble::*;
-use mfnf_commons::*;
+use mfnf_commons;
 
 rule_impl!(CheckTemplates, "Checks for the correct use of templates."
 => examples:
@@ -178,14 +178,14 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
             ref content
         } = *root {
 
-            if !is_plain_text(name) {
+            if !mfnf_commons::is_plain_text(name) {
                 self.push(invalid_template_name(position));
             }
 
             let template_name = extract_plain_text(name).trim().to_lowercase();
 
-            if let Some(template_spec) = spec_of(&template_name) {
-                let parsed = parse_template(root)
+            if let Some(template_spec) = mfnf_commons::spec_of(&template_name) {
+                let parsed = mfnf_commons::parse_template(root)
                     .expect(&format!("spec_of succeded but \
                         template parsing failed for {}!", template_name));
 
@@ -208,7 +208,7 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
                     let exists = present.iter().fold(false,
                         |acc, a| acc || arg_spec.names.contains(&a.name));
 
-                     if !exists && arg_spec.priority == Priority::Required {
+                     if !exists && arg_spec.priority == mfnf_commons::Priority::Required {
                         self.push(missing_argument(
                             position,
                             &default_argname
@@ -237,7 +237,7 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
                             self.push(illegal_content(
                                 position,
                                 actual_name,
-                                &arg_spec.predicate_source
+                                &arg_spec.predicate_name
                             ));
                         }
                     }
