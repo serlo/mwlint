@@ -40,20 +40,13 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckFormulas<'e> {
             return Ok(false)
         }
 
-        if let &Element::Formatted {
-            ref content,
-            ref markup,
-            ..
-        } = root {
-            if *markup != MarkupType::Math {
+        if let &Element::Formatted(ref formatted) = root {
+            if formatted.markup != MarkupType::Math {
                 return Ok(true)
             }
 
-            if let Some(&Element::Text {
-                ref position,
-                ref text
-            }) = content.first() {
-                let mut results = check_formula(text, position, settings);
+            if let Some(&Element::Text(ref text)) = formatted.content.first() {
+                let mut results = check_formula(&text.text, &text.position, settings);
                 for lint in results.drain(..) {
                     self.push(lint);
                 }

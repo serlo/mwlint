@@ -162,50 +162,45 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckLists<'e> {
             _: &Settings,
             _: &mut io::Write) -> io::Result<bool> {
 
-        if let Element::List {
-            ref position,
-            ref content,
-             ..
-        } = *root {
+        if let Element::List(ref list) = *root {
 
-            if content.len() == 1 {
-                self.push(list_one_element(position));
+            if list.content.len() == 1 {
+                self.push(list_one_element(&list.position));
             }
 
             let mut previous_kind = None;
-            let mut previous_item: Option<&Element> = None;
-            for (index, item) in content.iter().enumerate() {
-                if let Element::ListItem { ref kind, .. } = *item {
-                    let is_def = *kind == ListItemKind::Definition;
-                    let is_term = *kind == ListItemKind::DefinitionTerm;
-                    let is_last = index == content.len() - 1;
+            let mut previous_item: Option<&ListItem> = None;
+            for (index, item) in list.content.iter().enumerate() {
+                if let Element::ListItem(ref item) = *item {
+                    let is_def = item.kind == ListItemKind::Definition;
+                    let is_term = item.kind == ListItemKind::DefinitionTerm;
+                    let is_last = index == list.content.len() - 1;
                     let is_first = index == 0;
                     let prev_is_term = previous_kind == Some(ListItemKind::DefinitionTerm);
 
                     if (prev_is_term && !is_def) || (is_term && is_last) {
                         let mut position = if is_last {
-                            item.get_position()
+                            &item.position
                         } else {
-                            previous_item.unwrap_or(item).get_position()
+                            &previous_item.unwrap_or(item).position
                         };
                         self.push(term_without_def(position));
                     }
 
                     if (is_def && !prev_is_term) || (is_def && is_first) {
-                        let position = item.get_position();
-                        self.push(def_without_term(position));
+                        self.push(def_without_term(&item.position));
                     }
 
                     if let Some(prev) = previous_kind {
-                        let fac_kind = term_to_def(kind);
+                        let fac_kind = term_to_def(&item.kind);
                         let fac_prev = term_to_def(&prev);
 
                         if fac_kind != fac_prev {
-                            self.push(list_mixed_type(item.get_position()));
+                            self.push(list_mixed_type(&item.position));
                         }
                     }
 
-                    previous_kind = Some(kind.clone());
+                    previous_kind = Some(item.kind.clone());
                     previous_item = Some(item);
                 }
             }

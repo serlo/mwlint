@@ -89,6 +89,7 @@ macro_rules! rule_impl {
                 }
 
                 assert!(bad_matches >= 1);
+                eprintln!("{:#?}", good_lints);
                 assert_eq!(good_lints.len(), 0);
             }
         )*

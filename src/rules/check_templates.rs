@@ -172,27 +172,33 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
             _: &Settings,
             _: &mut io::Write) -> io::Result<bool> {
 
-        if let Element::Template {
-            ref position,
-            ref name,
-            ref content
-        } = *root {
+        if let Element::Template(ref template) = *root {
 
-            if !mfnf_commons::is_plain_text(name) {
-                self.push(invalid_template_name(position));
+            if !mfnf_commons::is_plain_text(&template.name) {
+                self.push(invalid_template_name(&template.position));
             }
 
-            let template_name = extract_plain_text(name).trim().to_lowercase();
+            let template_name = extract_plain_text(&template.name).trim().to_lowercase();
 
             if let Some(template_spec) = mfnf_commons::spec_of(&template_name) {
-                let parsed = mfnf_commons::parse_template(root)
-                    .expect(&format!("spec_of succeded but \
-                        template parsing failed for {}!", template_name));
+
+                if !mfnf_commons::parse_template(&template).is_some() {
+                    for arg_spec in &template_spec.attributes {
+                        let exists = find_arg(&template.content, &arg_spec.names).is_some();
+                        if !exists && arg_spec.priority == mfnf_commons::Priority::Required {
+                            self.push(missing_argument(
+                                &template.position,
+                                &arg_spec.default_name().trim().to_lowercase(),
+                            ));
+                        }
+                    }
+                    return Ok(true);
+                };
 
                 let default_name = template_spec.default_name().trim().to_lowercase();
                 if template_name != default_name {
                      self.push(deprecated_name(
-                        position,
+                        &template.position,
                         &template_name,
                         &default_name,
                         "template",
@@ -200,32 +206,18 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
                     ));
                 }
 
-                let present = parsed.present();
                 for arg_spec in &template_spec.attributes {
 
                     let default_argname = arg_spec.default_name()
                         .trim().to_lowercase();
-                    let exists = present.iter().fold(false,
-                        |acc, a| acc || arg_spec.names.contains(&a.name));
 
-                     if !exists && arg_spec.priority == mfnf_commons::Priority::Required {
-                        self.push(missing_argument(
-                            position,
-                            &default_argname
-                        ));
-                    }
-
-                    if let Some(&Element::TemplateArgument {
-                        ref position,
-                        ref name,
-                        ref value,
-                        ..
-                    }) = find_arg(content, &arg_spec.names) {
-                        let actual_name = name;
-
+                    if let Some(&Element::TemplateArgument(ref arg))
+                        = find_arg(&template.content, &arg_spec.names)
+                    {
+                        let actual_name = &arg.name;
                         if actual_name != &default_argname {
                             self.push(deprecated_name(
-                                position,
+                                &arg.position,
                                 actual_name,
                                 &default_argname,
                                 "argument",
@@ -233,9 +225,9 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
                             ));
                         }
 
-                        if !(arg_spec.predicate)(value) {
+                        if !(arg_spec.predicate)(&arg.value) {
                             self.push(illegal_content(
-                                position,
+                                &arg.position,
                                 actual_name,
                                 &arg_spec.predicate_name
                             ));
@@ -248,20 +240,16 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
                     = template_spec.attributes.iter()
                         .map(|a| a.default_name()).collect();
 
-                for argument in content {
-                    if let Element::TemplateArgument {
-                        ref position,
-                        ref name,
-                        ..
-                    } = *argument {
-                        let name = name.trim().to_lowercase();
+                for argument in &template.content {
+                    if let Element::TemplateArgument(ref arg) = *argument {
+                        let name = arg.name.trim().to_lowercase();
                         let has_spec = template_spec.attributes.iter()
                             .fold(false, |acc, arg_spec|
                                 acc || arg_spec.names.contains(&name));
 
                         if !has_spec {
                             self.push(illegal_argument(
-                                position,
+                                &arg.position,
                                 &name,
                                 &template_name,
                                 allowed_args.as_slice()
@@ -270,7 +258,7 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
                     }
                 }
             } else {
-                self.push(template_not_allowed(position, &template_name));
+                self.push(template_not_allowed(&template.position, &template_name));
             }
         }
         Ok(true)

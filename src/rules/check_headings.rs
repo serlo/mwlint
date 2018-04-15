@@ -69,31 +69,25 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckHeadings<'e> {
             settings: &Settings,
             _: &mut io::Write) -> io::Result<bool> {
 
-        if let &Element::Heading {
-            depth,
-            ref position,
-            ..
-        } = root {
+        if let &Element::Heading(ref heading) = root {
 
             // is heading too deep?
-            if depth > settings.max_heading_depth {
-                self.push(max_depth_lint(settings, position));
+            if heading.depth > settings.max_heading_depth {
+                self.push(max_depth_lint(settings, &heading.position));
             }
 
-            let current_depth = depth;
             let mut consistency_lint = None;
-
             {
                 // find parent heading
                 let parent = self.path.iter().rev().find(
-                    |e| if let Element::Heading { .. } = ***e {**e != root} else {false}
+                    |e| if let Element::Heading(_) = ***e {**e != root} else {false}
                 );
 
-                if let Some(&&Element::Heading { depth, .. }) = parent {
-                    if current_depth > depth + 1 {
+                if let Some(&&Element::Heading(ref parent)) = parent {
+                    if heading.depth > parent.depth + 1 {
                         consistency_lint = Some(inconsistent_hierarchy_lint(
-                            position,
-                            current_depth - depth - 1,
+                            &heading.position,
+                            heading.depth - parent.depth - 1,
                         ));
                     }
                 }
