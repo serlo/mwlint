@@ -58,6 +58,16 @@ impl<T: Serialize> Responder<'static> for Json<T> {
     }
 }
 
+#[get("/examples")]
+fn examples() -> Json<Vec<Example>> {
+    let rules = get_rules();
+    Json(rules.iter().fold(vec![], |mut vec, rule| {
+            vec.append(&mut rule.examples().clone());
+            vec
+        })
+    )
+}
+
 #[post("/", data = "<source_form>")]
 fn lint(source_form: Form<SourceForm>) -> Json<ResultKind> {
     let form = source_form.get();
@@ -83,7 +93,7 @@ fn lint(source_form: Form<SourceForm>) -> Json<ResultKind> {
 
 fn main() {
     rocket::ignite()
-        .mount("/", routes![lint, index])
-        .mount("/mwlint", routes![lint, index])
+        .mount("/", routes![lint, index, examples])
+        .mount("/mwlint", routes![lint, index, examples])
         .launch();
 }
