@@ -247,7 +247,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "mfnf_commons"
 version = "0.1.0"
-source = "git+https://github.com/vroland/mfnf-export.git#647f21ab62a04a2f5ce4d0276c9def3b13c40ab2"
+source = "git+https://github.com/vroland/mfnf-export.git#be6c06f2209f72eae1ed74be8077f0138b0056dc"
 dependencies = [
  "mediawiki_parser 0.2.0 (git+https://github.com/vroland/mediawiki-peg-rust.git)",
  "mfnf_derive 0.1.0 (git+https://github.com/vroland/mfnf-export.git)",
@@ -258,7 +258,7 @@ dependencies = [
 [[package]]
 name = "mfnf_derive"
 version = "0.1.0"
-source = "git+https://github.com/vroland/mfnf-export.git#647f21ab62a04a2f5ce4d0276c9def3b13c40ab2"
+source = "git+https://github.com/vroland/mfnf-export.git#be6c06f2209f72eae1ed74be8077f0138b0056dc"
 dependencies = [
  "proc-macro2 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "quote 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
