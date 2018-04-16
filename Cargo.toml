@@ -17,7 +17,7 @@ required-features = ["web"]
 web = ["rocket", "rocket_codegen", "serde_json"]
 
 [dependencies]
-mediawiki_parser = { git = "https://github.com/vroland/mediawiki-peg-rust.git" }
+mediawiki_parser = "0.3"
 mfnf_commons = { git = "https://github.com/vroland/mfnf-export.git" }
 rocket = { version = "0.3", optional = true }
 rocket_codegen = { version = "0.3", optional = true }

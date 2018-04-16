@@ -220,8 +220,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "mediawiki_parser"
-version = "0.2.0"
-source = "git+https://github.com/vroland/mediawiki-peg-rust.git#390710e78056f718647f4a00019efd39bb20d9f3"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "argparse 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "colored 1.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -247,9 +247,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "mfnf_commons"
 version = "0.1.0"
-source = "git+https://github.com/vroland/mfnf-export.git#be6c06f2209f72eae1ed74be8077f0138b0056dc"
+source = "git+https://github.com/vroland/mfnf-export.git#ba0a78aa508f1e6a7faa9099a2029c23c127eecc"
 dependencies = [
- "mediawiki_parser 0.2.0 (git+https://github.com/vroland/mediawiki-peg-rust.git)",
+ "mediawiki_parser 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "mfnf_derive 0.1.0 (git+https://github.com/vroland/mfnf-export.git)",
  "serde 1.0.38 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.38 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -258,7 +258,7 @@ dependencies = [
 [[package]]
 name = "mfnf_derive"
 version = "0.1.0"
-source = "git+https://github.com/vroland/mfnf-export.git#be6c06f2209f72eae1ed74be8077f0138b0056dc"
+source = "git+https://github.com/vroland/mfnf-export.git#ba0a78aa508f1e6a7faa9099a2029c23c127eecc"
 dependencies = [
  "proc-macro2 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "quote 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -282,7 +282,7 @@ version = "0.1.0"
 dependencies = [
  "argparse 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "colored 1.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "mediawiki_parser 0.2.0 (git+https://github.com/vroland/mediawiki-peg-rust.git)",
+ "mediawiki_parser 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "mfnf_commons 0.1.0 (git+https://github.com/vroland/mfnf-export.git)",
  "rayon 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rocket 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -688,7 +688,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum log 0.3.9 (registry+https://github.com/rust-lang/crates.io-index)" = "e19e8d5c34a3e0e2223db8e060f9e8264aeeb5c5fc64a4ee9965c062211c024b"
 "checksum log 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)" = "89f010e843f2b1a31dbd316b3b8d443758bc634bed37aabade59c686d644e0a2"
 "checksum matches 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)" = "100aabe6b8ff4e4a7e32c1c13523379802df0772b82466207ac25b013f193376"
-"checksum mediawiki_parser 0.2.0 (git+https://github.com/vroland/mediawiki-peg-rust.git)" = "<none>"
+"checksum mediawiki_parser 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)" = "6c1501620575f874bddfc3a906f226fb42d17c3e470963147f37b426c52bbd16"
 "checksum memchr 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)" = "148fab2e51b4f1cfc66da2a7c32981d1d3c083a803978268bb11fe4b86925e7a"
 "checksum memoffset 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "0f9dc261e2b62d7a622bf416ea3c5245cdd5d9a7fcc428c0d06804dfce1775b3"
 "checksum mfnf_commons 0.1.0 (git+https://github.com/vroland/mfnf-export.git)" = "<none>"
