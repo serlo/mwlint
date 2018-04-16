@@ -7,15 +7,16 @@
 
 .explanation {
     font-size: large;
+	margin: .5em 0 .5em 0;
 }
 
 .solution {
     color: green; 
+	font-size: medium;
+	margin: .5em 0 .5em 0;
 }
 
 .explanation_long {
-    color: grey;
-    font-size: small;
 }
 
 .lint-info {
@@ -33,7 +34,36 @@
     color: red;
 }
 
+.example-header {
+	font-size: large;
+	margin: .5em 0 .5em 0;
+}
 
+.example-good-tag {
+	color: green;	
+}
+
+.example-bad-tag {
+	color: red;
+}
+
+.example {
+	border-width: 3px;
+	border-color: grey;
+	margin: .5em;
+}
+.example-bad-expl {
+	margin-bottom: .5em;
+}
+
+.example-good, .example-bad {
+	font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
+	color: gray;
+	margin: .25em;
+	border-style: solid;
+	border-width: 1px;
+	padding: 10px;
+}
 
 /* The lint marker gutter */
 .CodeMirror-lint-markers {
@@ -118,4 +148,5 @@
   background-position: right bottom;
   width: 100%; height: 100%;
 }
+
 

@@ -1,3 +1,5 @@
+var mwlint_examples = [];
+
 if (document.getElementById("wpTextbox1") != null) {
 	$.getScript('https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/codemirror.min.js', function() {
 		console.log("codemirror loading...");
@@ -7,8 +9,14 @@ if (document.getElementById("wpTextbox1") != null) {
 		s_md = $.getScript( 'https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/mode/markdown/markdown.min.js' );
 		s_mb = $.getScript( 'https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/addon/edit/matchbrackets.min.js' );
 		s_al = $.getScript( 'https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/addon/selection/active-line.min.js' );
+		s_ex = 
 
-		$.when(s_lint, s_md, s_mb, s_al).done(init_editor);
+		$.when(s_lint, s_md, s_mb, s_al).done(() => {
+			$.getJSON('https://tools.wmflabs.org/mwlint/examples/', (result) => {
+				mwlint_examples = result;
+				init_editor();				
+			});
+		});
 	});
 } else {
 	console.log("MWLint: no editor. -> no codemirror modifications");
@@ -20,16 +28,23 @@ function init_editor() {
 	var wikiEditorToolbarEnabled, useCodeMirror, codeMirror; 
 	
 	var base = "https://tools.wmflabs.org/mwlint/";
-	
-	function escapeHtml(unsafe) {
-	    return unsafe
-	        .replace(/&/g, "&amp;")
-	        .replace(/</g, "&lt;")
-	        .replace(/>/g, "&gt;")
-	        .replace(/"/g, "&quot;")
-	        .replace(/'/g, "&#039;");
-	}
-	
+	var entityMap = {
+		'&': '&amp;',
+		'<': '&lt;',
+		'>': '&gt;',
+		'"': '&quot;',
+		"'": '&#39;',
+		'/': '&#x2F;',
+		'`': '&#x60;',
+		'=': '&#x3D;'
+	};
+
+	function escapeHtml (string) {
+		return String(string).replace(/[&<>"'`=\/]/g, function (s) {
+			return entityMap[s];
+		});
+	}	
+
 	function build_parse_lint(err) {
 	    var expected = escapeHtml(err.expected.join(", "));
 	    return {
@@ -102,6 +117,17 @@ function init_editor() {
         });
 	}
 
+	function get_examples(kind) {
+		var result = [];
+		for (var index = 0; index < mwlint_examples.length; index++) {
+			var example = mwlint_examples[index];
+			if (example.kind == kind) {
+				result.push(example);
+			}	
+		}
+		return result;
+	}
+
 	codeMirror = CodeMirror.fromTextArea(document.getElementById("wpTextbox1"), {
 		lineNumbers: true,
 		lineWrapping: true,
@@ -148,20 +174,38 @@ function init_editor() {
                         for ( var i = 0; i < lints.length; i++) {
                             var lint = lints[i];
                             var severity = lint.severity;
+							var examples = get_examples(lint.kind);
+							var example_html = "";
+							for (var j = 0; j < examples.length; j++) {
+								var example = examples[j];
+								example_html = example_html + "<div class=\"example\">" +
+									"<div class=\"example-bad-tag\">bad:</div>" + 
+									"<div class=\"example-bad\">" + escapeHtml(example.bad) + "</div>" +
+									"<div class=\"example-bad-expl\">" + escapeHtml(example.bad_explanation) + "</div>" + 
+									"<div class=\"example-good-tag\">good:</div>" + 
+
+									"<div class=\"example-good\">" + escapeHtml(example.good) + "</div>" + 
+									"<div class=\"example-good-expl\">" + escapeHtml(example.good_explanation) + "</div>" +
+								"</div>"	
+							}
                         
                             found.push({
                                 from: CodeMirror.Pos(lint.position.start.line - 1, lint.position.start.col - 1),
                                 to: CodeMirror.Pos(lint.position.end.line - 1, lint.position.end.col - 1),
-                                messageHTML: "<span class=\"explanation explanation-" + lint.severity + 
-                                    "\">" + lint.explanation + "</span>" + 
-                                    "<br><span class=\"solution\">" + lint.solution + "</span>" + 
-                                    "<br><span class=\"explanation_long\">" + lint.explanation_long + "</span>",
+                                messageHTML: "<div class=\"explanation explanation-" + lint.severity + 
+                                    "\">" + escapeHtml(lint.explanation) + "</div>" + 
+                                    "<div class=\"solution\">" + "&#8618; " + escapeHtml(lint.solution) + "</div>" + 
+                                    "<div class=\"explanation_long\">" + escapeHtml(lint.explanation_long) + "</div>" +
+									"<div class=\"example-container\">" + 
+											"<div class=\"example-header\">Examples:</div>" +
+											example_html + 
+									"</div>",	
                                 severity : severity
                             });
                         }
                         resolve(found);
                     }, function() {
-                        console.err("last lints is undefined, can't show lints in editor!");
+                        console.log("last lints is undefined, can't show lints in editor! -> maybe requests where blocked?");
                         reject([]);
                     });
                 });
@@ -169,3 +213,4 @@ function init_editor() {
         });	
     };
 }
+
