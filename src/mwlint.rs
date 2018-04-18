@@ -3,12 +3,14 @@ extern crate serde_yaml;
 extern crate argparse;
 extern crate mwlint;
 extern crate toml;
+extern crate mfnf_commons;
 
 use std::process;
 use mediawiki_parser::*;
 use std::fs;
 use std::io;
 use mwlint::*;
+use mfnf_commons::util::CachedTexChecker;
 use argparse::{ArgumentParser, StoreTrue, Store};
 
 macro_rules! DESCRIPTION {
@@ -52,7 +54,7 @@ fn main() {
             "A config file to override the default options."
         );
         ap.refer(&mut texvccheck_path).add_option(
-            &["-t", "--texvccheck"],
+            &["-p", "--texvccheck"],
             Store,
             "Path to the texvccheck binary."
         );
@@ -68,7 +70,7 @@ fn main() {
         process::exit(0);
     }
 
-    settings.texvccheck_path = texvccheck_path;
+    settings.tex_checker = Some(CachedTexChecker::new(&texvccheck_path, 10_000));
 
     let root: Element = (if !input_file.is_empty() {
         let file = fs::File::open(&input_file)

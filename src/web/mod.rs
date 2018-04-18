@@ -28,10 +28,6 @@ fn index() -> &'static str {
     see https://github.com/vroland/mwlint."
 }
 
-#[derive(FromForm)]
-struct SourceForm {
-    pub source: String,
-}
 
 #[derive(Debug, Serialize)]
 enum ResultKind {
@@ -68,11 +64,10 @@ fn examples() -> Json<Vec<Example>> {
     )
 }
 
-#[post("/", data = "<source_form>")]
-fn lint(source_form: Form<SourceForm>) -> Json<ResultKind> {
-    let form = source_form.get();
+#[post("/", data = "<source>")]
+fn lint(source: String) -> Json<ResultKind> {
 
-    let tree = match parse(&form.source) {
+    let tree = match parse(&source) {
         Ok(elem) => elem,
         Err(mwerror) => return Json(ResultKind::Error(mwerror)),
     };

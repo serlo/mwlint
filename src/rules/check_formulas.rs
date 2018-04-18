@@ -1,5 +1,5 @@
 use preamble::*;
-use std::process::{Command};
+use mfnf_commons::util::TexResult;
 use lint::{Example, Lint};
 
 rule_impl!(CheckFormulas, "Verify math formulas."
@@ -36,9 +36,11 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckFormulas<'e> {
             settings: &Settings,
             _: &mut io::Write) -> io::Result<bool> {
 
-        if settings.texvccheck_path.is_empty() {
+        let checker = if let Some(ref checker) = settings.tex_checker {
+            checker
+        } else {
             return Ok(false)
-        }
+        };
 
         if let &Element::Formatted(ref formatted) = root {
             if formatted.markup != MarkupType::Math {
@@ -46,67 +48,42 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckFormulas<'e> {
             }
 
             if let Some(&Element::Text(ref text)) = formatted.content.first() {
-                let mut results = check_formula(&text.text, &text.position, settings);
-                for lint in results.drain(..) {
-                    self.push(lint);
+                let error_cause = match checker.check(&text.text) {
+                    TexResult::Ok(_) => None,
+                    TexResult::SyntaxError => Some (
+                        ( "This formula is not valid LaTeX!".into(),
+                        LintKind::MathSyntaxError)
+                    ),
+                    TexResult::LexingError => Some (
+                        ( "This formula contains invalid characters!".into(),
+                        LintKind::MathLexingError)
+                    ),
+                    TexResult::UnknownFunction(f) => Some (
+                        ( format!("\"{}\" is not known / allowed in formulas!", &f),
+                        LintKind::MathUnknownFunction)
+                    ),
+                    TexResult::UnknownError => Some(
+                        ( "An unknown error occured with this formula!".into(),
+                        LintKind::MathUnknownFunction)
+                    )
+                };
+
+                if let Some(error) = error_cause {
+                    let err_lint = Lint {
+                        position: text.position.clone(),
+                        explanation: error.0.into(),
+                        explanation_long:
+                            "Only a subset of LaTeX with some additional macros is \
+                            allowed in MediaWiki markup. This formula does not result \
+                            in a correct LaTeX output.".into(),
+                        solution: format!("Only use LaTeX code allowed by MediaWiki!"),
+                        severity: Severity::Error,
+                        kind: error.1
+                    };
+                    self.push(err_lint);
                 }
             }
         }
         Ok(true)
     }
-}
-
-/// Check a Tex formula, return normalized version or error
-/// TODO: unify this with mfnf-export
-fn check_formula(
-    content: &str,
-    position: &Span,
-    settings: &Settings
-) -> Vec<Lint> {
-
-    let mut result = vec![];
-
-    let checked = texvccheck(content, settings);
-    let error_cause = match checked.chars().next() {
-        Some('+') => None,
-        Some('S') => Some( ("syntax error".into(), LintKind::MathSyntaxError) ),
-        Some('E') => Some( ("lexing error".into(), LintKind::MathLexingError) ),
-        Some('F') => Some( ( format!("unknown function `{}`",
-            checked.chars().skip(1).collect::<String>()), LintKind::MathUnknownFunction) ),
-        Some('-') => Some( ("other error".into(), LintKind::MathUnknownError) ),
-        None => Some( ("empty string".into(), LintKind::MathUnknownError) ),
-        _ => Some( ("unknown error".into(), LintKind::MathUnknownError ) ),
-    };
-
-    if let Some(error) = error_cause {
-        let err_lint = Lint {
-            position: position.clone(),
-            explanation: format!("This formula is invalid: {}", error.0),
-            explanation_long:
-                "Only a subset of LaTeX with some additional macros is \
-                 allowed in MediaWiki markup. This formula does not result \
-                 in a correct LaTeX output.".into(),
-            solution: format!("Only use LaTeX code allowed by MediaWiki!"),
-            severity: Severity::Error,
-            kind: error.1
-        };
-        result.push(err_lint);
-    }
-
-    return result;
-}
-
-/// Call the external program `texvccheck` to check a Tex formula
-fn texvccheck(formula: &str, settings: &Settings) -> String {
-    let output = Command::new(&settings.texvccheck_path)
-        .arg(formula)
-        .output();
-
-    let res = if let Ok(output) = output {
-        output.stdout
-    } else {
-        vec!['-' as u8]
-    };
-
-    String::from_utf8(res).unwrap_or("-".into())
 }
