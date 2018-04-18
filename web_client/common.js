@@ -112,8 +112,8 @@ function init_editor() {
         }
       };
       xhttp.open("POST", base, true);
-      xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-      xhttp.send("source=" + encodeURIComponent(source));
+      xhttp.setRequestHeader("Content-type", "text/plain");
+      xhttp.send(source);
     });
   }
 
