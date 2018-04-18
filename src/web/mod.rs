@@ -7,27 +7,46 @@ extern crate rocket;
 extern crate serde_json;
 extern crate mwlint;
 extern crate mediawiki_parser;
+extern crate mfnf_commons;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde;
+#[macro_use]
+extern crate lazy_static;
 
 use mediawiki_parser::*;
 use mwlint::*;
+use mfnf_commons::util::CachedTexChecker;
 use serde::{Serialize};
 use serde_json::Value;
+use std::env;
 
 use rocket::http::Status;
-use rocket::request::{Form};
 use rocket::response::{self, Responder, content};
 use rocket::http::Header;
 use rocket::request::Request;
+
+
+lazy_static! {
+    static ref SETTINGS: Settings<'static> = {
+        let mut settings = Settings::default();
+        if let Ok(path) = env::var("TEXVCCHECK_PATH") {
+            eprintln!("using {}", &path);
+            settings.tex_checker = Some(
+                CachedTexChecker::new(&path, 100_000)
+            );
+        } else {
+            eprintln!("not checking formulas...");
+        }
+        settings
+    };
+}
 
 #[get("/")]
 fn index() -> &'static str {
     "no GET endpoints available. Use POST to send mediawiki source code. \
     see https://github.com/vroland/mwlint."
 }
-
 
 #[derive(Debug, Serialize)]
 enum ResultKind {
@@ -72,13 +91,11 @@ fn lint(source: String) -> Json<ResultKind> {
         Err(mwerror) => return Json(ResultKind::Error(mwerror)),
     };
 
-    let mut settings = Settings::default();
-    settings.texvccheck_path = "".to_string();
     let mut rules = get_rules();
     let mut lints = vec![];
 
     for mut rule in &mut rules {
-        rule.run(&tree, &settings, &mut vec![])
+        rule.run(&tree, &SETTINGS, &mut vec![])
             .expect("error while checking rule!");
         lints.append(&mut rule.lints().iter().map(|l| l.clone()).collect())
     }
