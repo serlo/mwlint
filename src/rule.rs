@@ -73,7 +73,10 @@ macro_rules! rule_impl {
                 let good_input = $good;
                 let tree_bad = parse(bad_input).unwrap();
                 let tree_good = parse(good_input).unwrap();
-                let settings = Settings::default();
+                let mut settings = Settings::default();
+                settings.tex_checker = Some(
+                    CachedTexChecker::new("./texvccheck", 10)
+                );
                 let mut rule_bad = $t::new();
                 let bad_lints = tree_bad.check(&mut rule_bad, &settings)
                     .expect("rule crashed!");
