@@ -30,3 +30,12 @@ pub use settings::{Settings};
 pub use rule::{Rule, Checkable};
 pub use lint::{Example, Lint, Severity};
 pub use rules::*;
+
+/// Applies transformations to normalize the input tree.
+pub fn normalize(mut root: mediawiki_parser::Element,
+                 _settings: &settings::Settings)
+-> mediawiki_parser::transformations::TResult {
+
+    root = mfnf_commons::transformations::convert_template_list(root, ())?;
+    Ok(root)
+}

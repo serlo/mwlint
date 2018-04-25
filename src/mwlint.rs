@@ -72,7 +72,7 @@ fn main() {
 
     settings.tex_checker = Some(CachedTexChecker::new(&texvccheck_path, 10_000));
 
-    let root: Element = (if !input_file.is_empty() {
+    let mut root: Element = (if !input_file.is_empty() {
         let file = fs::File::open(&input_file)
             .expect("Could not open input file!");
         serde_yaml::from_reader(&file)
@@ -80,6 +80,8 @@ fn main() {
         serde_yaml::from_reader(io::stdin())
     }).expect("Could not parse input!");
 
+    root = normalize(root, &settings)
+        .expect("Input normalization error!");
 
     let mut rules = get_rules();
     let mut lints = vec![];

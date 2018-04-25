@@ -86,9 +86,16 @@ fn examples() -> Json<Vec<Example>> {
 #[post("/", data = "<source>")]
 fn lint(source: String) -> Json<ResultKind> {
 
-    let tree = match parse(&source) {
+    let mut tree = match parse(&source) {
         Ok(elem) => elem,
         Err(mwerror) => return Json(ResultKind::Error(mwerror)),
+    };
+
+    tree = match normalize(tree, &SETTINGS) {
+        Ok(elem) => elem,
+        Err(mwerror) => return Json(
+            ResultKind::Error(MWError::TransformationError(mwerror))
+        ),
     };
 
     let mut rules = get_rules();
