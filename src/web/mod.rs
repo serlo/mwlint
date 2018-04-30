@@ -7,7 +7,7 @@ extern crate rocket;
 extern crate serde_json;
 extern crate mwlint;
 extern crate mediawiki_parser;
-extern crate mfnf_commons;
+extern crate mwparser_utils;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde;
@@ -16,7 +16,7 @@ extern crate lazy_static;
 
 use mediawiki_parser::*;
 use mwlint::*;
-use mfnf_commons::util::CachedTexChecker;
+use mwparser_utils::util::CachedTexChecker;
 use serde::{Serialize};
 use serde_json::Value;
 use std::env;

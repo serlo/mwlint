@@ -1,5 +1,5 @@
 use preamble::*;
-use mfnf_commons::util::TexResult;
+use mwparser_utils::util::TexResult;
 use lint::{Example, Lint};
 
 rule_impl!(CheckFormulas, "Verify math formulas."

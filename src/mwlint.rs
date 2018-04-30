@@ -3,14 +3,14 @@ extern crate serde_yaml;
 extern crate argparse;
 extern crate mwlint;
 extern crate toml;
-extern crate mfnf_commons;
+extern crate mwparser_utils;
 
 use std::process;
 use mediawiki_parser::*;
 use std::fs;
 use std::io;
 use mwlint::*;
-use mfnf_commons::util::CachedTexChecker;
+use mwparser_utils::util::CachedTexChecker;
 use argparse::{ArgumentParser, StoreTrue, Store};
 
 macro_rules! DESCRIPTION {

@@ -1,5 +1,5 @@
 extern crate mediawiki_parser;
-extern crate mfnf_commons;
+extern crate mwparser_utils;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
@@ -20,7 +20,7 @@ mod preamble {
     pub use rule::*;
     pub use settings::{Settings, RuleMeta};
     pub use std::io;
-    pub use mfnf_commons::util::*;
+    pub use mwparser_utils::util::*;
 }
 
 /// The checking functions themselves.
@@ -36,6 +36,6 @@ pub fn normalize(mut root: mediawiki_parser::Element,
                  _settings: &settings::Settings)
 -> mediawiki_parser::transformations::TResult {
 
-    root = mfnf_commons::transformations::convert_template_list(root, ())?;
+    root = mwparser_utils::transformations::convert_template_list(root)?;
     Ok(root)
 }
