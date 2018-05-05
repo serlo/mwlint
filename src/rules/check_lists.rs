@@ -149,7 +149,7 @@ fn term_to_def(kind: &ListItemKind) -> ListItemKind {
     if let ListItemKind::DefinitionTerm = *kind {
         ListItemKind::Definition
     } else {
-        kind.clone()
+        *kind
     }
 }
 
@@ -187,7 +187,7 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckLists<'e> {
                         self.push(term_without_def(position));
                     }
 
-                    if (is_def && !prev_is_term) || (is_def && is_first) {
+                    if (!prev_is_term || is_first) && is_def {
                         self.push(def_without_term(&item.position));
                     }
 
@@ -200,7 +200,7 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckLists<'e> {
                         }
                     }
 
-                    previous_kind = Some(item.kind.clone());
+                    previous_kind = Some(item.kind);
                     previous_item = Some(item);
                 }
             }

@@ -13,15 +13,13 @@ pub use self::check_formulas::CheckFormulas;
 
 macro_rules! register {
     ($list:ident, $t1:tt :: $t2:tt) => {
-        $list.push(Box::new($t1::$t2::new()));
+        $list.push(Box::new($t1::$t2::default()));
     }
 }
 
-type RuleList<'e, 's: 'e> = Vec<Box<Rule<'e, 's>>>;
-
 /// Get a list of all available rules.
-pub fn get_rules<'e, 's: 'e>() -> RuleList<'e, 's> {
-    let mut rules: RuleList<'e, 's> = vec![];
+pub fn get_rules<'e, 's: 'e>() -> Vec<Box<Rule<'e, 's>>> {
+    let mut rules: Vec<Box<Rule<'e, 's>>> = vec![];
     register!(rules, check_headings::CheckHeadings);
     register!(rules, check_lists::CheckLists);
     register!(rules, check_templates::CheckTemplates);
@@ -31,7 +29,7 @@ pub fn get_rules<'e, 's: 'e>() -> RuleList<'e, 's> {
 
 /// Find all examples for lints of a given kind.
 pub fn get_examples<'e, 'r, 's: 'e>(
-    rules: &'r RuleList<'e, 's>,
+    rules: &'r [Box<Rule<'e, 's>>],
     kind: LintKind
 ) -> Vec<&'r Example> {
 

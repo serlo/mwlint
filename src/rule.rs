@@ -39,15 +39,15 @@ macro_rules! rule_impl {
             #[doc = $good]
             ///```
         )*
-        #[derive(Debug)]
+
         pub struct $t<'e> {
             pub path: Vec<&'e Element>,
             pub lints: Vec<Lint>,
             pub examples: Vec<Example>,
         }
 
-        impl<'e> $t<'e> {
-            pub fn new() -> $t<'e> {
+        impl<'e> Default for $t<'e> {
+            fn default() -> $t<'e> {
                 $t {
                     examples: vec![
                         $(
@@ -77,10 +77,10 @@ macro_rules! rule_impl {
                 settings.tex_checker = Some(
                     CachedTexChecker::new("./texvccheck", 10)
                 );
-                let mut rule_bad = $t::new();
+                let mut rule_bad = $t::default();
                 let bad_lints = tree_bad.check(&mut rule_bad, &settings)
                     .expect("rule crashed!");
-                let mut rule_good = $t::new();
+                let mut rule_good = $t::default();
                 let good_lints = tree_good.check(&mut rule_good, &settings)
                     .expect("rule crashed!");
 

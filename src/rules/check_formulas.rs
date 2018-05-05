@@ -42,7 +42,7 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckFormulas<'e> {
             return Ok(false)
         };
 
-        if let &Element::Formatted(ref formatted) = root {
+        if let Element::Formatted(ref formatted) = *root {
             if formatted.markup != MarkupType::Math {
                 return Ok(true)
             }
@@ -71,12 +71,12 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckFormulas<'e> {
                 if let Some(error) = error_cause {
                     let err_lint = Lint {
                         position: text.position.clone(),
-                        explanation: error.0.into(),
+                        explanation: error.0,
                         explanation_long:
                             "Only a subset of LaTeX with some additional macros is \
                             allowed in MediaWiki markup. This formula does not result \
                             in a correct LaTeX output.".into(),
-                        solution: format!("Only use LaTeX code allowed by MediaWiki!"),
+                        solution: "Only use LaTeX code allowed by MediaWiki!".into(),
                         severity: Severity::Error,
                         kind: error.1
                     };

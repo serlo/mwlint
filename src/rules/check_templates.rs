@@ -61,11 +61,11 @@ fn template_not_allowed(
     Lint {
         position: position.clone(),
         explanation: format!("{:?}-templates are not allowed / specified!", name),
-        explanation_long: format!(
+        explanation_long:
             "Only a specific set of templates is allowed for this project. \
              This rule is in place to make sure elements with the same meaning \
-             Are recognized as such and formatted in the same way."),
-        solution: format!("Use another template. Maybe this is just a spelling mistake?"),
+             Are recognized as such and formatted in the same way.".into(),
+        solution: "Use another template. Maybe this is just a spelling mistake?".into(),
         severity: Severity::Error,
         kind: LintKind::TemplateNotAllowed,
     }
@@ -76,13 +76,13 @@ fn invalid_template_name(
 ) -> Lint {
     Lint {
         position: position.clone(),
-        explanation: format!("formatted text is not allowed in template names!"),
-        explanation_long: format!(
+        explanation: "formatted text is not allowed in template names!".into(),
+        explanation_long:
             "Using text markup or even block elements in template names may cause \
             unexpected behaviour and incompatibility with external utilities. \
             Good template names are expressive, easy to type and consist of only \
-            alphanumerical characters plus _,.,: ."),
-        solution: format!("Use better template names."),
+            alphanumerical characters plus _,.,: .".into(),
+        solution: "Use better template names.".into(),
         severity: Severity::Error,
         kind: LintKind::InvalidTemplateName,
     }
@@ -115,12 +115,12 @@ fn missing_argument(
     Lint {
         position: position.clone(),
         explanation: format!("template argument {:?} is missing but required!", name),
-        explanation_long: format!(
+        explanation_long:
             "This template has arguments to tell it what to do. These can be named \
             (like {{name|argument_name=value}}) und anonymous {{name|value}}. \
             Anonymous arguments are equivalent to just enumerating named arguments: \
-            ({{name|1=value}} <=> {{name|value}})"),
-        solution: format!("Add a value for this argument."),
+            ({{name|1=value}} <=> {{name|value}})".into(),
+        solution: "Add a value for this argument.".into(),
         severity: Severity::Error,
         kind: LintKind::MissingTemplateArgument,
     }
@@ -140,8 +140,8 @@ fn illegal_content(
             "Some template arguments only allow certain kinds of text in their content. \
             In this case, the allowed values must fulfill the following property:\n{}",
             predicate_text),
-        solution: format!("Take a look at the template specification or think about \
-                           what makes sense."),
+        solution: "Take a look at the template specification or think about \
+                   what makes sense.".into(),
         severity: Severity::Error,
         kind: LintKind::IllegalArgumentContent,
     }
@@ -159,7 +159,7 @@ fn illegal_argument(
             argument_name, template_name),
         explanation_long: format!(
             "{:?} only allows the following arguments:\n{:?}", template_name, allowed),
-        solution: format!("Use one of the allowed template arguments."),
+        solution: "Use one of the allowed template arguments.".into(),
         severity: Severity::Warning,
         kind: LintKind::IllegalArgument,
     }
@@ -176,7 +176,7 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
 
         if let Element::Template(ref template) = *root {
 
-            if !mwparser_utils::is_plain_text(&template.name).is_ok() {
+            if mwparser_utils::is_plain_text(&template.name).is_err() {
                 self.push(invalid_template_name(&template.position));
             }
 
@@ -184,7 +184,7 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
 
             if let Some(template_spec) = mwparser_utils::spec_of(&template_name) {
 
-                if !mwparser_utils::parse_template(&template).is_some() {
+                if mwparser_utils::parse_template(&template).is_none() {
                     for arg_spec in &template_spec.attributes {
                         let exists = find_arg(&template.content, &arg_spec.names).is_some();
                         if !exists && arg_spec.priority == mwparser_utils::spec_meta::Priority::Required {
@@ -247,8 +247,7 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
                     if let Element::TemplateArgument(ref arg) = *argument {
                         let name = arg.name.trim().to_lowercase();
                         let has_spec = template_spec.attributes.iter()
-                            .fold(false, |acc, arg_spec|
-                                acc || arg_spec.names.contains(&name));
+                            .any(|arg_spec| arg_spec.names.contains(&name));
 
                         if !has_spec {
                             self.push(illegal_argument(

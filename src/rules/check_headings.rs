@@ -48,12 +48,12 @@ fn inconsistent_hierarchy_lint(
         position: position.clone(),
         explanation: "A sub heading should be exactly one level \
                         deeper than its parent heading!".into(),
-        explanation_long: format!(
+        explanation_long:
             "If a heading has a higher heading than a previous heading, \
             it is considered a sub heading of this heading. Thus, headings are \
             make up a hierarchy. But a heading more than one level deeper than \
             its parent makes no semantic sense. Heading levels should not be used \
-            to do text formatting!"),
+            to do text formatting!".into(),
         solution: format!("Reduce depth of this heading by {}.", diff),
         severity: Severity::Warning,
         kind: LintKind::InconsistentHeadingHierarchy,
@@ -69,7 +69,7 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckHeadings<'e> {
             settings: &Settings,
             _: &mut io::Write) -> io::Result<bool> {
 
-        if let &Element::Heading(ref heading) = root {
+        if let Element::Heading(ref heading) = *root {
 
             // is heading too deep?
             if heading.depth > settings.max_heading_depth {
