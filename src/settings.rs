@@ -1,4 +1,4 @@
-use mwparser_utils::{TemplateSpec, spec, util::CachedTexChecker};
+use mwparser_utils::{spec_meta::TemplateSpec, spec, util::CachedTexChecker};
 
 /// Rule metadata.
 #[derive(Debug, Serialize, PartialEq, Clone, Deserialize)]

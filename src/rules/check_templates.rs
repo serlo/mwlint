@@ -129,11 +129,13 @@ fn missing_argument(
 fn illegal_content(
     position: &Span,
     argument_name: &str,
+    reason: &str,
     predicate_text: &str,
 ) -> Lint {
     Lint {
         position: position.clone(),
-        explanation: format!("The content of {} contains illegal elements!", argument_name),
+        explanation: format!("This markup is not allowed in the content of {}: {}",
+            argument_name, reason),
         explanation_long: format!(
             "Some template arguments only allow certain kinds of text in their content. \
             In this case, the allowed values must fulfill the following property:\n{}",
@@ -174,7 +176,7 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
 
         if let Element::Template(ref template) = *root {
 
-            if !mwparser_utils::is_plain_text(&template.name) {
+            if !mwparser_utils::is_plain_text(&template.name).is_ok() {
                 self.push(invalid_template_name(&template.position));
             }
 
@@ -185,7 +187,7 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
                 if !mwparser_utils::parse_template(&template).is_some() {
                     for arg_spec in &template_spec.attributes {
                         let exists = find_arg(&template.content, &arg_spec.names).is_some();
-                        if !exists && arg_spec.priority == mwparser_utils::Priority::Required {
+                        if !exists && arg_spec.priority == mwparser_utils::spec_meta::Priority::Required {
                             self.push(missing_argument(
                                 &template.position,
                                 &arg_spec.default_name().trim().to_lowercase(),
@@ -225,10 +227,11 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
                             ));
                         }
 
-                        if !(arg_spec.predicate)(&arg.value) {
+                        if let Err(error) = (arg_spec.predicate)(&arg.value) {
                             self.push(illegal_content(
-                                &arg.position,
+                                error.tree.map(|e| e.get_position()).unwrap_or(&arg.position),
                                 actual_name,
+                                &error.cause,
                                 &arg_spec.predicate_name
                             ));
                         }
