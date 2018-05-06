@@ -182,6 +182,10 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
 
             let template_name = extract_plain_text(&template.name).trim().to_lowercase();
 
+            if template_name.starts_with("#lst:") {
+                return Ok(true)
+            }
+
             if let Some(template_spec) = mwparser_utils::spec_of(&template_name) {
 
                 if mwparser_utils::parse_template(&template).is_none() {
