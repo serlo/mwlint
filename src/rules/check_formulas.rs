@@ -6,23 +6,25 @@ rule_impl!(CheckFormulas, "Verify math formulas."
 => examples:
     math_syntax_error,
     "<math>\\frac{1}{2</math>",
-    "This formula is missing a closing tag.",
+    "There is an error in the math forumla. In this formula for example is \
+    the closing tag '}' missing.",
     "<math>\\frac{1}{2}</math>",
     "This formula is syntactically correct."
     => LintKind::MathSyntaxError
 ;
     math_lexing_error,
-    "<math>\\[ bla</math>",
-    "Some inputs contain invalid tokens.",
-    "<math>bla</math>",
-    "This input does not contain weired characters."
+    "<math>\\[ x^2 \\]</math>",
+    "The formula contains invalid characters. The chracter `[` is for example \
+    not allowed in LaTeX for MediaWiki.",
+    "<math>x^2</math>",
+    "This formula does not contain invalid characters."
     => LintKind::MathLexingError
 ;
     math_unknown_function,
-    "<math>\\heyho{1+2}</math>",
-    "The function `heyho` is not defined in MediaWiki LaTeX",
+    "<math>\\badfrac{1}{2}</math>",
+    "The macro `badfrac` is not defined in MediaWiki LaTeX",
     "<math>\\frac{1}{2}</math>",
-    "The `frac` function is known."
+    "`frac` is a valid LaTeX macro."
     => LintKind::MathUnknownFunction
 );
 
