@@ -21,6 +21,7 @@ mod preamble {
     pub use settings::{Settings, RuleMeta};
     pub use std::io;
     pub use mwparser_utils::util::*;
+    pub use std::path::PathBuf;
 }
 
 /// The checking functions themselves.

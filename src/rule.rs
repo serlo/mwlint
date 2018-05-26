@@ -75,7 +75,7 @@ macro_rules! rule_impl {
                 let tree_good = parse(good_input).unwrap();
                 let mut settings = Settings::default();
                 settings.tex_checker = Some(
-                    CachedTexChecker::new("./texvccheck", 10)
+                    CachedTexChecker::new(&PathBuf::from("./texvccheck"), 10)
                 );
                 let mut rule_bad = $t::default();
                 let bad_lints = tree_bad.check(&mut rule_bad, &settings)
