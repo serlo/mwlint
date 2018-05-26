@@ -116,12 +116,18 @@ fn term_without_def(
 ) -> Lint {
     Lint {
         position: position.clone(),
-        explanation: "A defined term (;) must be followed by its definition (:)!".into(),
+        explanation:
+            "A defined term (;) must be followed by its \
+             definition (:)!".into(),
         explanation_long:
-            "The ; and : elements mark definition lists. They should only be used \
-            for lists of a terms and their corresponding definition. Using it for \
-            indentation defeats its semantic meaning.".into(),
-        solution: "Add a definition item (:) after the term.".into(),
+            "The ; and : elements mark definition lists. They should only be \
+             used for lists of terms and their corresponding definitions. \
+             Using it for indentation defeats its semantic meaning.".into(),
+        solution:
+            "Add a definition item (:) after the term or use a better \
+             formating. You may use a heading here or \
+             {{:Mathe für Nicht-Freaks: Vorlage:Beweisschritt|..}} for proof \
+             steps.".into(),
         severity: Severity::Warning,
         kind: LintKind::DefinitionTermWithoutDef,
     }
@@ -132,12 +138,17 @@ fn def_without_term(
 ) -> Lint {
     Lint {
         position: position.clone(),
-        explanation: "A definition (:) must be preceded by a definition term (;)!".into(),
+        explanation:
+            "A definition (:) must be preceded by a definition \
+             term (;)!".into(),
         explanation_long:
-            "The ; and : elements mark definition lists. They should only be used \
-            for lists of a terms and their corresponding definition. Using it for \
-            indentation defeats its semantic meaning.".into(),
-        solution: "Add a term (;) before the definition.".into(),
+            "The ; and : elements mark definition lists. They should only be \
+            used for lists of terms and their corresponding definitions. \
+            Using it for indentation defeats its semantic meaning.".into(),
+        solution:
+            "Add a term (;) before the definition or use a better formating. \
+             For example you can use `{{Formel|...}}` for formulas or \
+             {{-|...}} for important paragraphs.".into(),
         severity: Severity::Warning,
         kind: LintKind::DefinitionWithoutTerm,
     }
@@ -148,14 +159,15 @@ fn list_one_element(
 ) -> Lint {
      Lint {
         position: position.clone(),
-        explanation: "Lists with one element are useless!".into(),
+        explanation: "Each list should at least define two elements.".into(),
         explanation_long:
             "A list is a collection of elements. \
-            But this list only contains one list element. Maybe some items are missing \
+            This list only contains one element. Maybe some items are missing \
             or some other kind of markup should be used.".into(),
         solution:
-            "Do you need a list here? For lists with longer paragraphs, \
-             use the `list`-template!".into(),
+            "Do you need a list here? You may use another markup. For lists \
+             with a longer paragraphs you can use the {{Liste|...}} \
+             template.".into(),
         severity: Severity::Info,
         kind: LintKind::ListOneElement,
     }
@@ -166,12 +178,15 @@ fn list_mixed_type(
 ) -> Lint {
     Lint {
         position: position.clone(),
-        explanation: "Lists kinds (unordered, ordered, definition) should not be mixed!".into(),
+        explanation:
+            "Lists kinds (unordered, ordered, definition) should not be \
+             mixed!".into(),
         explanation_long:
-            "Mediawiki allows mixed types of list items. This is discouraged, as it does \
-            not convey any universally understood meaning.".into(),
+            "Mediawiki allows mixed types of list items. This is discouraged, \
+             as it does not convey any universally understood meaning.".into(),
         solution:
-            "Use consistent item types or split into several lists.".into(),
+            "Use consistent item types or split your list into several \
+             lists.".into(),
         severity: Severity::Error,
         kind: LintKind::ListMixedType,
     }
