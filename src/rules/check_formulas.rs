@@ -53,19 +53,25 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckFormulas<'e> {
                 let error_cause = match checker.check(&text.text) {
                     TexResult::Ok(_) => None,
                     TexResult::SyntaxError => Some (
-                        ( "This formula is not valid LaTeX!".into(),
+                        ( "This formula is not a valid LaTeX formula. You \
+                           need to correct it.".into(),
                         LintKind::MathSyntaxError)
                     ),
                     TexResult::LexingError => Some (
-                        ( "This formula contains invalid characters!".into(),
+                        ( "This formula contains characters which are not \
+                           allowed in LaTeX for MediaWiki. You need to delete \
+                           the unallowed characters.".into(),
                         LintKind::MathLexingError)
                     ),
                     TexResult::UnknownFunction(f) => Some (
-                        ( format!("\"{}\" is not known / allowed in formulas!", &f),
+                        ( format!("The macro `{}` is not known in LaTeX for \
+                                   MediaWiki or is not allowed in formulas. \
+                                   You need to correct the macro name or \
+                                   to change your formula.", &f),
                         LintKind::MathUnknownFunction)
                     ),
                     TexResult::UnknownError => Some(
-                        ( "An unknown error occured with this formula!".into(),
+                        ( "An unknown error occured with this formula.".into(),
                         LintKind::MathUnknownFunction)
                     )
                 };
@@ -75,10 +81,11 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckFormulas<'e> {
                         position: text.position.clone(),
                         explanation: error.0,
                         explanation_long:
-                            "Only a subset of LaTeX with some additional macros is \
-                            allowed in MediaWiki markup. This formula does not result \
-                            in a correct LaTeX output.".into(),
-                        solution: "Only use LaTeX code allowed by MediaWiki!".into(),
+                            "Only a subset of LaTeX with some additional \
+                             macros is allowed in MediaWiki. This formula \
+                             does not result in a correct LaTeX output.".into(),
+                        solution: "Only use LaTeX code allowed by the \
+                                   MediaWiki Software.".into(),
                         severity: Severity::Error,
                         kind: error.1
                     };
