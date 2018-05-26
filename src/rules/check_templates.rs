@@ -5,52 +5,58 @@ rule_impl!(CheckTemplates, "Checks for the correct use of templates."
 => examples:
     unknown_template,
     "{{unknown_template|arg1}}",
-    "The template `unknown template` is not allowed / specified for this project.",
-    "{{formula|<math>1+1=2</math>}}",
-    "The specification for this template exists in this project and allows for its use."
+    "The template `unknown template` is not allowed or specified for this \
+     project.",
+    "{{Formel|<math>1+1=2</math>}}",
+    "The {{Formel|...}} template exists and is used properly."
     => LintKind::TemplateNotAllowed
 ;
     formatted_template_name,
-    "{{this is {{bla}} text|arg}}",
-    "This template's name contains a template, \
-     which can lead to problems with other tools.",
-    "{{formula|<math>bla</math>}}",
-    "To ensure compatibility, only use alphanumeric characters plus _,.,:"
+    "{{template-{{foo}}|arg}}",
+    "This template's name contains a template, which can lead to problems \
+     with other tools.",
+    "{{Formel|<math>x^2</math>}}",
+    "To ensure compatibility, only use alphanumeric characters plus _,.,: and \
+     white spaces."
     => LintKind::InvalidTemplateName
 ;
-    deprecated_formula_name,
-    "{{formel|<math>bla</math>}}",
-    "This template used to be called `formel` but has been renamed to `formula`.",
-    "{{formula|<math>bla</math>}}",
-    "The new naming conventions are used."
+    deprecated_template_name,
+    "{{Hinweis|Important remark}}",
+    "This template used to be called `Hinweis`. However we use the template \
+     {{:Mathe für Nicht-Freaks: Vorlage:Hinweis|...}} in this project since \
+     we have a personalized formating for it.",
+    "{{:Mathe für Nicht-Freaks: Vorlage:Hinweis|Important remark}}",
+    "Our naming conventions are used."
     => LintKind::DeprecatedTemplateName
-;
-    deprecated_arg_name,
-    "{{formula|formel=<math>bla</math>}}",
-    "Calling this template with a named argument is unecessarily verbose.",
-    "{{formula|<math>bla</math>}}",
-    "The template is called as conventions dictate."
-    => LintKind::DeprecatedArgumentName
+// Currently we have no deprecated arguments. Uncomment this when there some.
+//;
+//    deprecated_arg_name,
+//    "{{Formel|formel=<math>x^2</math>}}",
+//    "Calling this template with a named argument is unecessarily verbose.",
+//    "{{Formel|<math>x^2</math>}}",
+//    "The template is called with unnamed parameters."
+//    => LintKind::DeprecatedArgumentName
 ;
     missing_arg,
-    "{{formula}}",
-    "Calling the formula template without a math formula makes no sense.",
-    "{{formula|<math>bla</math>}}",
-    "The required argument \"1\" is given."
+    "{{Formel}}",
+    "The {{Formel|...}} template needs a parameter for the formula.",
+    "{{Formel|<math>x^2</math>}}",
+    "The required unnamed argument \"1\" with the formula is given."
     => LintKind::MissingTemplateArgument
 ;
     illegal_argument_greeting,
-    "{{formula|<math>bla</math>|greeting=This is just normal text.}}",
-    "The formula template is called with wrong arguments, `greeting` does not belong to formula.",
-    "{{formula|<math>bla</math>}}",
-    "The first argument is a math formula."
+    "{{Formel|<math>x^2</math>|greeting=This is just normal text.}}",
+    "The formula template is called with wrong arguments, `greeting` is no \
+     valid parameter for the formula template.",
+    "{{Formel|<math>x^2</math>}}",
+    "The invalid parameter was deleted."
     => LintKind::IllegalArgument
 ;
     illegal_formula_content,
-    "{{formula|This is just normal text.}}",
-    "A formula template must be given a math element.",
-    "{{formula|<math>bla</math>}}",
-    "The first argument is a math formula."
+    "{{Formel|<math>x^2</math> and <math>b^2</math>}}",
+    "A formula template must be given only a math element.",
+    "{{Formel|<math>x^2 \\text{ and } b^2</math>}}",
+    "The formula template only contains a math element."
     => LintKind::IllegalArgumentContent
 );
 
