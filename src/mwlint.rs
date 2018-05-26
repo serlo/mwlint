@@ -9,6 +9,7 @@ use std::process;
 use mediawiki_parser::*;
 use std::fs;
 use std::io;
+use std::path::PathBuf;
 use mwlint::*;
 use mwparser_utils::util::CachedTexChecker;
 use argparse::{ArgumentParser, StoreTrue, Store};
@@ -70,7 +71,7 @@ fn main() {
         process::exit(0);
     }
 
-    settings.tex_checker = Some(CachedTexChecker::new(&texvccheck_path, 10_000));
+    settings.tex_checker = Some(CachedTexChecker::new(&PathBuf::from(&texvccheck_path), 10_000));
 
     let mut root: Element = (if !input_file.is_empty() {
         let file = fs::File::open(&input_file)
