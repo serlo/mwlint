@@ -65,12 +65,18 @@ fn template_not_allowed(
 ) -> Lint {
     Lint {
         position: position.clone(),
-        explanation: format!("{:?}-templates are not allowed / specified!", name),
+        explanation:
+            format!("The template \"{:?}\" is not allowed / specified!", name),
         explanation_long:
-            "Only a specific set of templates is allowed for this project. \
-             This rule is in place to make sure elements with the same meaning \
-             Are recognized as such and formatted in the same way.".into(),
-        solution: "Use another template. Maybe this is just a spelling mistake?".into(),
+            "Only a specific set of templates are allowed for this project. \
+             This rule is in place to make sure elements with the same \
+             meaning are recognized as such and formatted in the same way. We \
+             also do only support some templates in our PDF-Export.".into(),
+        solution:
+            format!("Use another template. Maybe this is just a spelling \
+                     mistake? You can also contact the main authors so that \
+                     they add the template \"{:?}\" to the project \
+                     specification.", name),
         severity: Severity::Error,
         kind: LintKind::TemplateNotAllowed,
     }
@@ -81,12 +87,12 @@ fn invalid_template_name(
 ) -> Lint {
     Lint {
         position: position.clone(),
-        explanation: "formatted text is not allowed in template names!".into(),
+        explanation: "Formatted text is not allowed in template names!".into(),
         explanation_long:
-            "Using text markup or even block elements in template names may cause \
-            unexpected behaviour and incompatibility with external utilities. \
-            Good template names are expressive, easy to type and consist of only \
-            alphanumerical characters plus _,.,: .".into(),
+            "Using text markup or even block elements in template names may \
+             cause unexpected behaviour and incompatibilities with external \
+             tools we use. Good template names are expressive, easy to type \
+             and consist of only alphanumerical characters plus _,.,: .".into(),
         solution: "Use better template names.".into(),
         severity: Severity::Error,
         kind: LintKind::InvalidTemplateName,
@@ -106,8 +112,9 @@ fn deprecated_name(
         explanation_long: format!(
             "For some {}s, the name they are referred to changes over time. \
              To make the transition easier, old and new names are allowed. \
-             But eventually, only one name should be used.", objtext),
-        solution: format!("Use {} instead of {}.", better, used),
+             However we will drop the support for the old {} name in the \
+             future. Please use the new name.", objtext, objtext),
+        solution: format!("Use \"{}\" instead of \"{}\".", better, used),
         severity: Severity::Info,
         kind,
     }
@@ -119,13 +126,16 @@ fn missing_argument(
 ) -> Lint {
     Lint {
         position: position.clone(),
-        explanation: format!("template argument {:?} is missing but required!", name),
+        explanation:
+            format!("The template argument {:?} is missing but \
+                     required!", name),
         explanation_long:
-            "This template has arguments to tell it what to do. These can be named \
-            (like {{name|argument_name=value}}) und anonymous {{name|value}}. \
-            Anonymous arguments are equivalent to just enumerating named arguments: \
-            ({{name|1=value}} <=> {{name|value}})".into(),
-        solution: "Add a value for this argument.".into(),
+            "This template has arguments to tell it what to do. These can be \
+             given by named parameters like {{name|argument_name=value}}) and \
+             by unnamed parameters as in {{name|value}}. Unnamed arguments \
+             are equivalent to just enumerating named arguments: \
+             ({{name|1=value}} <=> {{name|value}})".into(),
+        solution: format!("Add a value for the argument \"{:?}\".", name),
         severity: Severity::Error,
         kind: LintKind::MissingTemplateArgument,
     }
@@ -139,14 +149,16 @@ fn illegal_content(
 ) -> Lint {
     Lint {
         position: position.clone(),
-        explanation: format!("This markup is not allowed in the content of {}: {}",
-            argument_name, reason),
-        explanation_long: format!(
-            "Some template arguments only allow certain kinds of text in their content. \
-            In this case, the allowed values must fulfill the following property:\n{}",
-            predicate_text),
-        solution: "Take a look at the template specification or think about \
-                   what makes sense.".into(),
+        explanation:
+            format!("This markup is not allowed in the content of \"{}\": {}",
+                    argument_name, reason),
+        explanation_long:
+            format!("Some template arguments only allow certain kinds of text \
+                     in their content. In this case, the allowed values must \
+                     fulfill the following property:\n{}", predicate_text),
+        solution:
+            "Take a look at the template specification or contact the main
+             authors to ask for help. Thanks!".into(),
         severity: Severity::Error,
         kind: LintKind::IllegalArgumentContent,
     }
@@ -160,11 +172,13 @@ fn illegal_argument(
 ) -> Lint {
     Lint {
         position: position.clone(),
-        explanation: format!("The argument {:?} is not allowed for {:?}",
-            argument_name, template_name),
-        explanation_long: format!(
-            "{:?} only allows the following arguments:\n{:?}", template_name, allowed),
-        solution: "Use one of the allowed template arguments.".into(),
+        explanation:
+            format!("The argument \"{:?}\" is not allowed for the \
+                     template \"{:?}\"", argument_name, template_name),
+        explanation_long:
+            format!("{:?} only allows the following arguments:\n{:?}",
+                    template_name, allowed),
+        solution: "Only use the allowed template arguments.".into(),
         severity: Severity::Warning,
         kind: LintKind::IllegalArgument,
     }
