@@ -1,95 +1,81 @@
 extern crate mediawiki_parser;
 extern crate serde_yaml;
-extern crate argparse;
+#[macro_use]
+extern crate structopt;
 extern crate mwlint;
 extern crate toml;
 extern crate mwparser_utils;
 
 use std::process;
-use mediawiki_parser::*;
 use std::fs;
 use std::io;
 use std::path::PathBuf;
 use mwlint::*;
 use mwparser_utils::util::CachedTexChecker;
-use argparse::{ArgumentParser, StoreTrue, Store};
+use structopt::StructOpt;
 
-macro_rules! DESCRIPTION {
-() => (
-"This program takes a yaml syntax tree of a mediawiki document
-(as created by `mwtoast`) as input and checks it for for discouraged
-patterns and other nitpicks."
-)
+#[derive(Debug, StructOpt)]
+#[structopt(name = "mwlint", about = "This program \
+takes a yaml syntax tree of a mediawiki document \
+(as created by `mwtoast`) as input and checks it for for discouraged \
+patterns and other nitpicks.")]
+struct Args {
+    /// Dump the default settings to stdout.
+    #[structopt(short = "d", long = "dump-config")]
+    dump_config: bool,
+    /// Path to the input file.
+    #[structopt(parse(from_os_str), short = "i", long = "input")]
+    input_file: Option<PathBuf>,
+    /// Path to the config file.
+    #[structopt(parse(from_os_str), short = "c", long = "config")]
+    config: Option<PathBuf>,
+    /// Path to the texvccheck binary (formula checking).
+    #[structopt(parse(from_os_str), short = "p", long = "texvccheck-path")]
+    texvccheck_path: Option<PathBuf>,
 }
 
-fn main() {
-    let mut use_stdin = false;
-    let mut dump_config = false;
-    let mut input_file = "".to_string();
-    let mut config_file = "".to_string();
-    let mut texvccheck_path = "./texvccheck".to_string();
-    {
-        let mut ap = ArgumentParser::new();
-        ap.set_description(DESCRIPTION!());
-        ap.refer(&mut use_stdin).add_option(
-            &["-s", "--stdin"],
-            StoreTrue,
-            "Use stdin as input file",
-        );
+fn main() -> Result<(), std::io::Error> {
+    let args = Args::from_args();
 
-        ap.refer(&mut input_file).add_option(
-            &["-i", "--input"],
-            Store,
-            "Path to the input file",
-        );
-        ap.refer(&mut dump_config).add_option(
-            &["-d", "--dump-settings"],
-            StoreTrue,
-            "Dump the current settings to stdout. \
-             If no configuration file is loaded, \
-             dump the default options."
-        );
-        ap.refer(&mut config_file).add_option(
-            &["-c", "--config"],
-            Store,
-            "A config file to override the default options."
-        );
-        ap.refer(&mut texvccheck_path).add_option(
-            &["-p", "--texvccheck"],
-            Store,
-            "Path to the texvccheck binary."
-        );
+    let mut settings = if let Some(path) = args.config {
+        let file = fs::File::open(&path)?;
+        serde_yaml::from_reader(&file)
+            .expect("Error reading settings:")
+    } else {
+        Settings::default()
+    };
 
-        ap.parse_args_or_exit();
-    }
-
-    let mut settings = Settings::default();
-
-    if dump_config {
+    if args.dump_config {
         println!("{}", toml::to_string(&settings)
             .expect("Could serialize settings!"));
         process::exit(0);
     }
 
-    settings.tex_checker = Some(CachedTexChecker::new(&PathBuf::from(&texvccheck_path), 10_000));
+    if let Some(path) = args.texvccheck_path {
+        settings.tex_checker = Some(CachedTexChecker::new(
+            &path, 10_000
+        ));
+    } else {
+        eprintln!("Warning: no texvccheck path, won't perform checks!");
+    }
 
-    let mut root: Element = (if !input_file.is_empty() {
-        let file = fs::File::open(&input_file)
-            .expect("Could not open input file!");
+
+    let mut root = if let Some(path) = args.input_file {
+        let file = fs::File::open(&path)?;
         serde_yaml::from_reader(&file)
     } else {
         serde_yaml::from_reader(io::stdin())
-    }).expect("Could not parse input!");
+    }.expect("Error reading input:");
 
     root = normalize(root, &settings)
-        .expect("Input normalization error!");
+        .expect("Input normalization error:");
 
     let mut rules = get_rules();
     let mut lints = vec![];
 
     for mut rule in &mut rules {
         rule.run(&root, &settings, &mut vec![])
-            .expect("error while checking rule!");
+            .expect("error while checking rule:");
         lints.append(&mut rule.lints().clone())
     }
 
@@ -101,4 +87,8 @@ fn main() {
             eprintln!("{}", example);
         }
     }
+
+    println!("{}", &serde_yaml::to_string(&lints)
+        .expect("could not serialize lints:"));
+    Ok(())
 }
