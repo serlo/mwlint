@@ -28,14 +28,13 @@ rule_impl!(CheckTemplates, "Checks for the correct use of templates."
     "{{:Mathe für Nicht-Freaks: Vorlage:Hinweis|Important remark}}",
     "Our naming conventions are used."
     => LintKind::DeprecatedTemplateName
-// Currently we have no deprecated arguments. Uncomment this when there some.
-//;
-//    deprecated_arg_name,
-//    "{{Formel|formel=<math>x^2</math>}}",
-//    "Calling this template with a named argument is unecessarily verbose.",
-//    "{{Formel|<math>x^2</math>}}",
-//    "The template is called with unnamed parameters."
-//    => LintKind::DeprecatedArgumentName
+;
+    deprecated_arg_name,
+    "{{Formel|formel=<math>x^2</math>}}",
+    "Calling this template with a named argument is unecessarily verbose.",
+    "{{Formel|<math>x^2</math>}}",
+    "The template is called with unnamed parameters."
+    => LintKind::DeprecatedArgumentName
 ;
     missing_arg,
     "{{Formel}}",
