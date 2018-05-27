@@ -20,6 +20,7 @@ use mwparser_utils::util::CachedTexChecker;
 use serde::{Serialize};
 use serde_json::Value;
 use std::env;
+use std::path::PathBuf;
 
 use rocket::http::Status;
 use rocket::response::{self, Responder, content};
@@ -33,7 +34,7 @@ lazy_static! {
         if let Ok(path) = env::var("TEXVCCHECK_PATH") {
             eprintln!("using {}", &path);
             settings.tex_checker = Some(
-                CachedTexChecker::new(&path, 100_000)
+                CachedTexChecker::new(&PathBuf::from(path), 100_000)
             );
         } else {
             eprintln!("not checking formulas...");
