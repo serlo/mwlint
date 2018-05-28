@@ -305,7 +305,7 @@ dependencies = [
 [[package]]
 name = "mwparser_utils"
 version = "0.1.0"
-source = "git+https://github.com/vroland/mediawiki-parser-utils.git#3d80237396a260033ffd4f6bcc75e0ba9b9f75ee"
+source = "git+https://github.com/vroland/mediawiki-parser-utils.git#a0e519970449fb7bb25b0bd2448c244e724d1830"
 dependencies = [
  "mediawiki_parser 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "mwparser_utils_derive 0.1.0 (git+https://github.com/vroland/mediawiki-parser-utils.git)",
@@ -316,7 +316,7 @@ dependencies = [
 [[package]]
 name = "mwparser_utils_derive"
 version = "0.1.0"
-source = "git+https://github.com/vroland/mediawiki-parser-utils.git#3d80237396a260033ffd4f6bcc75e0ba9b9f75ee"
+source = "git+https://github.com/vroland/mediawiki-parser-utils.git#a0e519970449fb7bb25b0bd2448c244e724d1830"
 dependencies = [
  "proc-macro2 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "quote 0.5.2 (registry+https://github.com/rust-lang/crates.io-index)",
