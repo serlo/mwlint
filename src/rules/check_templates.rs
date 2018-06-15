@@ -1,5 +1,5 @@
 use preamble::*;
-use mwparser_utils;
+use mfnf_template_spec::{spec_of, parse_template, spec_meta, is_plain_text};
 
 rule_impl!(CheckTemplates, "Checks for the correct use of templates."
 => examples:
@@ -195,7 +195,7 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
 
         if let Element::Template(ref template) = *root {
 
-            if mwparser_utils::is_plain_text(&template.name).is_err() {
+            if is_plain_text(&template.name).is_err() {
                 self.push(invalid_template_name(&template.position));
             }
 
@@ -205,12 +205,12 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
                 return Ok(true)
             }
 
-            if let Some(template_spec) = mwparser_utils::spec_of(&template_name) {
+            if let Some(template_spec) = spec_of(&template_name) {
 
-                if mwparser_utils::parse_template(&template).is_none() {
+                if parse_template(&template).is_none() {
                     for arg_spec in &template_spec.attributes {
                         let exists = find_arg(&template.content, &arg_spec.names).is_some();
-                        if !exists && arg_spec.priority == mwparser_utils::spec_meta::Priority::Required {
+                        if !exists && arg_spec.priority == spec_meta::Priority::Required {
                             self.push(missing_argument(
                                 &template.position,
                                 &arg_spec.default_name().trim().to_lowercase(),

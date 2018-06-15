@@ -1,5 +1,6 @@
 extern crate mediawiki_parser;
 extern crate mwparser_utils;
+extern crate mfnf_template_spec;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
@@ -20,7 +21,7 @@ mod preamble {
     pub use rule::*;
     pub use settings::{Settings, RuleMeta};
     pub use std::io;
-    pub use mwparser_utils::util::*;
+    pub use mwparser_utils::*;
     pub use std::path::PathBuf;
 }
 

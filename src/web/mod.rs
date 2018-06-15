@@ -16,7 +16,7 @@ extern crate lazy_static;
 
 use mediawiki_parser::*;
 use mwlint::*;
-use mwparser_utils::util::CachedTexChecker;
+use mwparser_utils::CachedTexChecker;
 use serde::{Serialize};
 use serde_json::Value;
 use std::env;

@@ -11,7 +11,7 @@ use std::fs;
 use std::io;
 use std::path::PathBuf;
 use mwlint::*;
-use mwparser_utils::util::CachedTexChecker;
+use mwparser_utils::CachedTexChecker;
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
