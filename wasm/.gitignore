@@ -13,3 +13,4 @@
 test.*
 *.wasm
 *.js
+*.d.ts

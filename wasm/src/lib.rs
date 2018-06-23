@@ -7,8 +7,9 @@ extern crate serde_json;
 
 use wasm_bindgen::prelude::*;
 
+/// Naive linter function. Outputs result as serialized JSON.
 #[wasm_bindgen]
-pub fn lint_mediawiki(input: &str) -> String {
+pub fn lint(input: &str) -> String {
     let settings = mwlint::Settings::default();
 
     let mut tree = match mediawiki_parser::parse(&input) {
@@ -32,5 +33,20 @@ pub fn lint_mediawiki(input: &str) -> String {
         lints.append(&mut rule.lints().iter().map(|l| l.clone()).collect())
     }
 
-    serde_json::to_string(&lints).expect("could not serialize")
+    serde_json::to_string(&lints)
+        .expect("could not serialize lints")
 }
+
+/// Lint examples as JSON string.
+#[wasm_bindgen]
+pub fn examples() -> String {
+    let rules = mwlint::get_rules();
+    let examples = rules.iter().fold(vec![], |mut vec, rule| {
+        vec.append(&mut rule.examples().clone());
+        vec
+    });
+
+    serde_json::to_string(&examples)
+        .expect("could not serialize examples")
+}
+
