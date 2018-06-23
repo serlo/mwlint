@@ -278,7 +278,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "mfnf_template_spec"
 version = "0.1.0"
-source = "git+https://github.com/vroland/mfnf-template-spec.git#b3d06aa204f81b4d73c9c9480f6547453cfc76a3"
+source = "git+https://github.com/vroland/mfnf-template-spec.git#2731f79dd26f2b41211df9882873eaafd055437b"
 dependencies = [
  "mediawiki_parser 0.3.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "mwparser_utils 0.1.0 (git+https://github.com/vroland/mediawiki-parser-utils.git)",
