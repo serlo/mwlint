@@ -26,6 +26,13 @@ rule_impl!(CheckFormulas, "Verify math formulas."
     "<math>\\frac{1}{2}</math>",
     "`frac` is a valid LaTeX macro."
     => LintKind::MathUnknownFunction
+;
+    righarrow_to_implies,
+    "<math>A\\Rightarrow B</math>",
+    "Rightarrow is not semantic and usually means implies.",
+    "<math>A\\implies B</math>",
+    "`implies` is correctly used. You may need to use `\\implies{}` before `&`."
+    => LintKind::DeprecatedRightarrow
 );
 
 
@@ -38,18 +45,36 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckFormulas<'e> {
             settings: &Settings,
             _: &mut io::Write) -> io::Result<bool> {
 
-        let checker = if let Some(ref checker) = settings.tex_checker {
-            checker
-        } else {
-            return Ok(false)
-        };
-
         if let Element::Formatted(ref formatted) = *root {
             if formatted.markup != MarkupType::Math {
                 return Ok(true)
             }
 
             if let Some(&Element::Text(ref text)) = formatted.content.first() {
+
+                if text.text.contains("\\Rightarrow") {
+                    let arrow_lint = Lint {
+                        position: text.position.clone(),
+                        explanation: "\\Rightarrow should not be used \
+                            in math markup any more.".into(),
+                        explanation_long:
+                            "\\implies should be used instead of \\Rightarrow,
+                            because it conveys more semantic meaning. Sometimes \
+                            \\implies{} works better before `&`.".into(),
+                        solution: "Replace \\Rightarrow by \
+                                   \\implies or \\implies{}.".into(),
+                        severity: Severity::Warning,
+                        kind: LintKind::DeprecatedRightarrow,
+                    };
+                    self.push(arrow_lint);
+                }
+
+                let checker = if let Some(ref checker) = settings.tex_checker {
+                    checker
+                } else {
+                    return Ok(false)
+                };
+
                 let error_cause = match checker.check(&text.text) {
                     TexResult::Ok(_) => None,
                     TexResult::SyntaxError => Some (

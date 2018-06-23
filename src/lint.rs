@@ -44,6 +44,7 @@ pub enum LintKind {
     MathLexingError,
     MathUnknownFunction,
     MathUnknownError,
+    DeprecatedRightarrow,
 }
 
 /// Specifies examples for linter rules.
