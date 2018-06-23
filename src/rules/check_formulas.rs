@@ -37,7 +37,7 @@ rule_impl!(CheckFormulas, "Verify math formulas."
     leftrightarrow_to_iff,
     "<math>A\\Leftrightarrow B</math>",
     "Leftrightarrow is not semantic and usually means iff.",
-    "<math>A\\implies B</math>",
+    "<math>A\\iff B</math>",
     "`iff` is correctly used. Iff means \"if and only if\"."
     => LintKind::DeprecatedLeftrightarrow
 );
