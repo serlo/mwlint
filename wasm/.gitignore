@@ -12,5 +12,5 @@
 # Ignore test files
 test.*
 *.wasm
-*.js
+/*.js
 *.d.ts
