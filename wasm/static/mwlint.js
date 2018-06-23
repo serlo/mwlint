@@ -11,7 +11,7 @@ function add_script(url) {
     })
 };
 
-if (window.location.href.includes("Nicht-Freaks") && document.getElementById("wpTextbox1") != null) {
+if (mw.config.get("wgPageName").startsWith("Mathe_für_Nicht-Freaks:") && document.getElementById("wpTextbox1") != null) {
   add_script('https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/codemirror.min.js').then(() => {
     mw.loader.load('https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/codemirror.min.css', 'text/css');
     
