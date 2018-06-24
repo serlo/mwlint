@@ -29,6 +29,8 @@ impl<'p> Default for Settings<'p> {
             max_heading_depth: 4,
             html_whitelist: vec![
                 "section".into(),
+                "dfn".into(),
+                "ref".into(),
             ],
             tex_checker: None,
             template_spec: spec::<'p>(),
