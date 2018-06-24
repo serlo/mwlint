@@ -13,6 +13,8 @@ pub struct RuleMeta {
 pub struct Settings<'p> {
     /// Maximum allowed depth of a heading.
     pub max_heading_depth: usize,
+    /// List of allowed html tags.
+    pub html_whitelist: Vec<String>,
     /// Object performing formula verification.
     #[serde(skip)]
     pub tex_checker: Option<CachedTexChecker>,
@@ -25,6 +27,9 @@ impl<'p> Default for Settings<'p> {
     fn default() -> Self {
         Settings {
             max_heading_depth: 4,
+            html_whitelist: vec![
+                "section".into(),
+            ],
             tex_checker: None,
             template_spec: spec::<'p>(),
         }

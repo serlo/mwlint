@@ -5,11 +5,13 @@ mod check_headings;
 mod check_lists;
 mod check_templates;
 mod check_formulas;
+mod check_html;
 
 pub use self::check_headings::CheckHeadings;
 pub use self::check_lists::CheckLists;
 pub use self::check_templates::CheckTemplates;
 pub use self::check_formulas::CheckFormulas;
+pub use self::check_html::CheckHtml;
 
 macro_rules! register {
     ($list:ident, $t1:tt :: $t2:tt) => {
@@ -24,6 +26,7 @@ pub fn get_rules<'e, 's: 'e>() -> Vec<Box<Rule<'e, 's>>> {
     register!(rules, check_lists::CheckLists);
     register!(rules, check_templates::CheckTemplates);
     register!(rules, check_formulas::CheckFormulas);
+    register!(rules, check_html::CheckHtml);
     rules
 }
 
