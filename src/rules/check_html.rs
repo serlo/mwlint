@@ -26,7 +26,8 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckHtml<'e> {
             if !settings.html_whitelist.contains(&html.name.trim().to_lowercase()) {
                 let html_lint = Lint {
                     position: html.position.clone(),
-                    explanation: "\"{}\" is not allowed for this project.".into(),
+                    explanation: format!("\"{}\" is not allowed for this project.",
+                                         &html.name),
                     explanation_long:
                         "Custom HTML tags are usually not well portable and \
                         can impair consistency. <span> for example would allow \
