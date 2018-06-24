@@ -135,6 +135,35 @@ function init_editor() {
     viewportMargin: Infinity,
   });
 
+  function show_summary(stats) {
+    var severities = ["error", "warning", "info"];
+    var box = document.getElementById("mwlint-stats-box");
+    if (!box) {
+      var toolbar = document.getElementById("wikiEditor-ui-toolbar");
+      if (!toolbar) { return };
+      var box = document.createElement('div');
+      box.setAttribute("id", "mwlint-stats-box")
+      toolbar.insertBefore(box, toolbar.getElementsByClassName("sections")[0]);
+      for (var i=0; i<severities.length; i++) {
+        var elem = document.createElement('span');
+        elem.setAttribute("id", "mwlint-stats-" + severities[i]);
+        elem.setAttribute("class", "mwlint-stat CodeMirror-lint-marker-" + severities[i]);
+        box.appendChild(elem);
+      }
+    }
+    for (var i=0; i<severities.length; i++) {
+      var severity = severities[i];
+      var elem = document.getElementById("mwlint-stats-" + severity);
+      if (elem) {
+        if (stats.hasOwnProperty(severity)) {
+          elem.textContent = stats[severity];
+        } else {
+          elem.textContent = "✓"
+        }
+      }
+    }
+  } 
+
   function register_mfnf_extensions() {
 
     // CodeMirror, copyright (c) by Marijn Haverbeke and others
@@ -160,12 +189,19 @@ function init_editor() {
           var source = text.replace(/\n\r/g, "\n");
           fetch_lints(source).then(function(lints) {
             var found = [];
+			var lint_counts = {};
             lints.sort(cmp_severity);
             for (var i = 0; i < lints.length; i++) {
               var lint = lints[i];
               var severity = lint.severity;
               var examples = get_examples(lint.kind);
               var example_html = "";
+
+              if (!lint_counts[severity]) {
+                lint_counts[severity] = 0;
+              }
+      			  lint_counts[severity] = lint_counts[severity] + 1
+
               for (var j = 0; j < examples.length; j++) {
                 var example = examples[j];
                 example_html = example_html + "<div class=\"example\">" +
@@ -193,6 +229,7 @@ function init_editor() {
                 severity: severity
               });
             }
+            show_summary(lint_counts);
             resolve(found);
           }, function() {
             console.log("getting lints failed! Maybe wasm loading error?");
