@@ -3,7 +3,6 @@ extern crate serde_yaml;
 #[macro_use]
 extern crate structopt;
 extern crate mwlint;
-extern crate toml;
 extern crate mwparser_utils;
 
 use std::process;
@@ -46,7 +45,7 @@ fn main() -> Result<(), std::io::Error> {
     };
 
     if args.dump_config {
-        println!("{}", toml::to_string(&settings)
+        println!("{}", serde_yaml::to_string(&settings)
             .expect("Could serialize settings!"));
         process::exit(0);
     }
