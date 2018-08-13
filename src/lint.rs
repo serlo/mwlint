@@ -47,6 +47,7 @@ pub enum LintKind {
     DeprecatedRightarrow,
     DeprecatedLeftrightarrow,
     IllegalHtml,
+    IllegalSectionName,
 }
 
 /// Specifies examples for linter rules.

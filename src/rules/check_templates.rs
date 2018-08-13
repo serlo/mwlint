@@ -57,6 +57,13 @@ rule_impl!(CheckTemplates, "Checks for the correct use of templates."
     "{{Formel|<math>x^2 \\text{ and } b^2</math>}}",
     "The formula template only contains a math element."
     => LintKind::IllegalArgumentContent
+;
+    illegal_section_name,
+    "{{#lst:Mathe für Nicht-Freaks: Example|\"section name\"}}",
+    "The name of an included section is enclosed in \" or \'.",
+    "{{#lst:Mathe für Nicht-Freaks: Example|section name}}",
+    "The section name is written in plain text."
+    => LintKind::IllegalSectionName
 );
 
 fn template_not_allowed(
@@ -184,6 +191,22 @@ fn illegal_argument(
     }
 }
 
+fn illegal_section(
+    position: &Span,
+    message: &str,
+) -> Lint {
+    Lint {
+        position: position.clone(),
+        explanation: message.into(),
+        explanation_long:
+            format!("A section inclusion must be of the format {{#lst:<article name>|<section_name>}}\n\
+                    with <article_name> and <section_name> beeing plain text (without quotes!)"),
+        solution: "Only use the allowed template arguments.".into(),
+        severity: Severity::Error,
+        kind: LintKind::IllegalSectionName,
+    }
+}
+
 impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
 
     path_impl!();
@@ -202,6 +225,31 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
             let template_name = extract_plain_text(&template.name).trim().to_lowercase();
 
             if template_name.starts_with("#lst:") {
+                let section_name = template.content.first()
+                    .and_then(|c| if let Element::TemplateArgument(v) = c {
+                        Some(extract_plain_text(&v.value))
+                    } else {None})
+                    .unwrap_or_default();
+                let article_name = template_name.trim_left_matches("#lst:").trim();
+
+                let mut message = None;
+                if section_name.is_empty() || article_name.is_empty() {
+                    message = Some("Name of the included section and \
+                                   article name must not be empty!");
+                }
+                let quotes = ['\"', '\'', '“', '”', '‘', '’', '«', '»', '„'];
+                if section_name.chars().any(|c| quotes.contains(&c)) {
+                    message = Some("Name of the article or included section \
+                                    must not contain quotation marks!");
+                }
+
+                if let Some(message) = message {
+                    self.push(illegal_section(
+                        &template.position,
+                        message,
+                    ));
+                }
+
                 return Ok(true)
             }
 
