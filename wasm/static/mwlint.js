@@ -12,6 +12,9 @@ function add_script(url) {
 };
 
 if (mw.config.get("wgPageName").startsWith("Mathe_für_Nicht-Freaks:") && document.getElementById("wpTextbox1") != null) {
+	var linter = add_script('https://tools-static.wmflabs.org/mwlint/wasm/mwlint_wasm.js').then(() => {
+		return window.wasm_bindgen('https://tools.wmflabs.org/mwlint/static/wasm/mwlint_wasm_bg.wasm');
+	});
   add_script('https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/codemirror.min.js').then(() => {
     mw.loader.load('https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/codemirror.min.css', 'text/css');
     
@@ -19,14 +22,10 @@ if (mw.config.get("wgPageName").startsWith("Mathe_für_Nicht-Freaks:") && docume
     var markdown = add_script('https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/mode/markdown/markdown.min.js');
     var brackets= add_script('https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/addon/edit/matchbrackets.min.js');
     var active_line = add_script('https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/addon/selection/active-line.min.js');
-	var linter = add_script('https://tools-static.wmflabs.org/mwlint/wasm/mwlint_wasm.js');
     
       Promise.all([lint_addon, markdown, brackets, active_line, linter]).then((values) => {
-		// initialize wasm module
-		window.wasm_bindgen('https://tools-static.wmflabs.org/mwlint/wasm/mwlint_wasm_bg.wasm').then(() => {;
-            mwlint_examples = JSON.parse(window.wasm_bindgen.examples());
-            init_editor();
-       });
+		mwlint_examples = JSON.parse(window.wasm_bindgen.examples());
+		init_editor();
       });
   });
 };
@@ -222,6 +221,7 @@ function init_editor() {
                   "\">" + escapeHtml(lint.explanation) + "</div>" +
                   "<div class=\"solution\">" + "&#8618; " + escapeHtml(lint.solution) + "</div>" +
                   "<div class=\"explanation_long\">" + escapeHtml(lint.explanation_long) + "</div>" +
+				  "<hr class=\"example-sep\">" + 
                   "<div class=\"example-container\">" +
                   "<div class=\"example-header\">Examples:</div>" +
                   example_html +

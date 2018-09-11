@@ -6,13 +6,14 @@
 }
 
 .explanation {
+	color: darkred;
     font-size: large;
 	margin: .5em 0 .5em 0;
 }
 
 .solution {
     color: green; 
-	font-size: medium;
+	font-size: large;
 	margin: .5em 0 .5em 0;
 }
 
@@ -52,6 +53,15 @@
 	border-color: grey;
 	margin: .5em;
 }
+
+.example-sep {
+	margin: .8em 0 .8em;
+	height: 2px;
+}
+
+.example-container {
+}
+
 .example-bad-expl {
 	margin-bottom: .5em;
 }
