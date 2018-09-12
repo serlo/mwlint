@@ -91,7 +91,7 @@ dependencies = [
 
 [[package]]
 name = "mediawiki_parser"
-version = "0.3.7"
+version = "0.3.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "argparse 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -105,9 +105,9 @@ dependencies = [
 [[package]]
 name = "mfnf_template_spec"
 version = "0.1.0"
-source = "git+https://github.com/vroland/mfnf-template-spec.git#b0e5fdea611a79ca32845e8d3a67a9bdd64c7412"
+source = "git+https://github.com/vroland/mfnf-template-spec.git#3a9a055c2ebd8c00234913d6c3ecefcfd523f5fb"
 dependencies = [
- "mediawiki_parser 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "mediawiki_parser 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "mwparser_utils 0.1.0 (git+https://github.com/vroland/mediawiki-parser-utils.git)",
  "mwparser_utils_derive 0.1.0 (git+https://github.com/vroland/mediawiki-parser-utils.git)",
  "serde 1.0.78 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -119,7 +119,7 @@ name = "mwlint"
 version = "0.1.0"
 dependencies = [
  "colored 1.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "mediawiki_parser 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "mediawiki_parser 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "mfnf_template_spec 0.1.0 (git+https://github.com/vroland/mfnf-template-spec.git)",
  "mwparser_utils 0.1.0 (git+https://github.com/vroland/mediawiki-parser-utils.git)",
  "serde 1.0.78 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -133,7 +133,7 @@ name = "mwlint-wasm"
 version = "0.1.0"
 dependencies = [
  "lazy_static 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "mediawiki_parser 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "mediawiki_parser 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "mwlint 0.1.0",
  "serde 1.0.78 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.78 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -146,7 +146,7 @@ name = "mwparser_utils"
 version = "0.1.0"
 source = "git+https://github.com/vroland/mediawiki-parser-utils.git#3f42e0334b103b9e9e4e647f5846d187b8bff3ce"
 dependencies = [
- "mediawiki_parser 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "mediawiki_parser 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "mwparser_utils_derive 0.1.0 (git+https://github.com/vroland/mediawiki-parser-utils.git)",
  "serde 1.0.78 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.78 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -224,7 +224,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "proc-macro2 0.4.19 (registry+https://github.com/rust-lang/crates.io-index)",
  "quote 0.6.8 (registry+https://github.com/rust-lang/crates.io-index)",
- "syn 0.15.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "syn 0.15.4 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -284,7 +284,7 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "0.15.3"
+version = "0.15.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "proc-macro2 0.4.19 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -348,7 +348,7 @@ dependencies = [
  "proc-macro2 0.4.19 (registry+https://github.com/rust-lang/crates.io-index)",
  "quote 0.6.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.27 (registry+https://github.com/rust-lang/crates.io-index)",
- "syn 0.15.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "syn 0.15.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "wasm-bindgen-shared 0.2.21 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -368,7 +368,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "proc-macro2 0.4.19 (registry+https://github.com/rust-lang/crates.io-index)",
  "quote 0.6.8 (registry+https://github.com/rust-lang/crates.io-index)",
- "syn 0.15.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "syn 0.15.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "wasm-bindgen-backend 0.2.21 (registry+https://github.com/rust-lang/crates.io-index)",
  "wasm-bindgen-shared 0.2.21 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -423,7 +423,7 @@ dependencies = [
 "checksum libc 0.2.43 (registry+https://github.com/rust-lang/crates.io-index)" = "76e3a3ef172f1a0b9a9ff0dd1491ae5e6c948b94479a3021819ba7d860c8645d"
 "checksum linked-hash-map 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)" = "70fb39025bc7cdd76305867c4eccf2f2dcf6e9a57f5b21a93e1c2d86cd03ec9e"
 "checksum log 0.4.5 (registry+https://github.com/rust-lang/crates.io-index)" = "d4fcce5fa49cc693c312001daf1d13411c4a5283796bac1084299ea3e567113f"
-"checksum mediawiki_parser 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)" = "c6c0371485571a917dffb3125a6a996487f616f6aff7600ca4f6e47396f329c0"
+"checksum mediawiki_parser 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)" = "4df78c60e26cd6e87077c12fb82e989476aa76c91001e2ddb1ef297be3bb1cd9"
 "checksum mfnf_template_spec 0.1.0 (git+https://github.com/vroland/mfnf-template-spec.git)" = "<none>"
 "checksum mwparser_utils 0.1.0 (git+https://github.com/vroland/mediawiki-parser-utils.git)" = "<none>"
 "checksum mwparser_utils_derive 0.1.0 (git+https://github.com/vroland/mediawiki-parser-utils.git)" = "<none>"
@@ -442,7 +442,7 @@ dependencies = [
 "checksum structopt 0.2.10 (registry+https://github.com/rust-lang/crates.io-index)" = "d8e9ad6a11096cbecdcca0cc6aa403fdfdbaeda2fb3323a39c98e6a166a1e45a"
 "checksum structopt-derive 0.2.10 (registry+https://github.com/rust-lang/crates.io-index)" = "4cbce8ccdc62166bd594c14396a3242bf94c337a51dbfa9be1076dd74b3db2af"
 "checksum syn 0.14.9 (registry+https://github.com/rust-lang/crates.io-index)" = "261ae9ecaa397c42b960649561949d69311f08eeaea86a65696e6e46517cf741"
-"checksum syn 0.15.3 (registry+https://github.com/rust-lang/crates.io-index)" = "e5c1514eb7bb4216fc722b3cd08783d326d7de0d62f6d5e48a774f610bc97cb6"
+"checksum syn 0.15.4 (registry+https://github.com/rust-lang/crates.io-index)" = "9056ebe7f2d6a38bc63171816fd1d3430da5a43896de21676dc5c0a4b8274a11"
 "checksum termion 1.5.1 (registry+https://github.com/rust-lang/crates.io-index)" = "689a3bdfaab439fd92bc87df5c4c78417d3cbe537487274e9b0b2dce76e92096"
 "checksum textwrap 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)" = "307686869c93e71f94da64286f9a9524c0f308a9e1c87a583de8e9c9039ad3f6"
 "checksum unicode-width 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)" = "882386231c45df4700b275c7ff55b6f3698780a650026380e72dabe76fa46526"
