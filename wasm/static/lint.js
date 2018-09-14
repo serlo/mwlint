@@ -17,14 +17,15 @@
     tt.className = "CodeMirror-lint-tooltip";
     tt.appendChild(content.cloneNode(true));
     document.body.appendChild(tt);
+	var anchor = e.path[0];
+	var updater = setInterval(position, 100);
 
-    function position(e) {
-      //if (!tt.parentNode) return CodeMirror.off(document, "mousemove", position);
-      tt.style.top = Math.max(0, e.clientY - tt.offsetHeight - 5) + "px";
-      tt.style.left = (e.clientX + 5) + "px";
+    function position(e) {	  
+      if (!tt.parentNode) return clearInterval(updater);
+	  var pos = anchor.getBoundingClientRect();
+      tt.style.top = (pos.y - tt.offsetHeight - 5) + "px";
+      tt.style.left = (pos.x + 5) + "px";
     }
-    // do not move with mouse
-    // CodeMirror.on(document, "mousemove", position);
     position(e);
 
     if (tt.style.opacity != null) tt.style.opacity = 1;
