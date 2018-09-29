@@ -8,22 +8,13 @@ name = "mwlint"
 path = "src/mwlint.rs"
 doc = false
 
-[[bin]]
-name = "mwlint_web"
-path = "src/web/mod.rs"
-required-features = ["web"]
-
 [features]
-web = ["rocket", "rocket_codegen", "serde_json", "lazy_static"]
+web = []
 
 [dependencies]
 mediawiki_parser = "0.3"
 mwparser_utils = { git = "https://github.com/vroland/mediawiki-parser-utils.git" }
 mfnf_template_spec = { git = "https://github.com/vroland/mfnf-template-spec.git" }
-rocket = { version = "0.3", optional = true }
-rocket_codegen = { version = "0.3", optional = true }
-serde_json = { version = "1.0", optional = true } 
-lazy_static = { version = "1.0", optional = true }
 serde = "1.0"
 serde_derive = "1.0"
 serde_yaml = "0.7"
