@@ -23,42 +23,37 @@ rule_impl!(CheckHeadings, "Checks for erroneous headings."
     => LintKind::InconsistentHeadingHierarchy
 );
 
-
-fn max_depth_lint(
-    settings: &Settings,
-    position: &Span
-) -> Lint {
+fn max_depth_lint(settings: &Settings, position: &Span) -> Lint {
     let max = settings.max_heading_depth;
     Lint {
         position: position.clone(),
-        explanation: format!(
-            "A heading should not be deeper than level {}!", max),
+        explanation: format!("A heading should not be deeper than level {}!", max),
         explanation_long: format!(
             "MFNF aims for a relatively shallow article structure. \
              To achieve this, the minimum heading level allowed is 2, \
-             the maximum heading level is {}.", max),
-        solution:
-            "Change your headings or your article structure to have a more \
-             shallow structure.".into(),
+             the maximum heading level is {}.",
+            max
+        ),
+        solution: "Change your headings or your article structure to have a more \
+                   shallow structure."
+            .into(),
         severity: Severity::Warning,
         kind: LintKind::MaxHeadingDepthViolation,
     }
 }
 
-fn inconsistent_hierarchy_lint(
-    position: &Span,
-    diff: usize
-) -> Lint {
+fn inconsistent_hierarchy_lint(position: &Span, diff: usize) -> Lint {
     Lint {
         position: position.clone(),
         explanation: "A sub heading should be exactly one level \
-                      deeper than its parent heading!".into(),
-        explanation_long:
-            "If a heading has a higher heading than a previous heading, it is \
+                      deeper than its parent heading!"
+            .into(),
+        explanation_long: "If a heading has a higher heading than a previous heading, it is \
              considered a sub heading of this heading. Thus, headings make up \
              a hierarchy. But a heading more than one level deeper than its \
              parent makes no semantic sense. Heading levels should not be
-             used to do text formatting!".into(),
+             used to do text formatting!"
+            .into(),
         solution: format!("Reduce depth of this heading by {}.", diff),
         severity: Severity::Warning,
         kind: LintKind::InconsistentHeadingHierarchy,
@@ -66,16 +61,15 @@ fn inconsistent_hierarchy_lint(
 }
 
 impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckHeadings<'e> {
-
     path_impl!();
 
-    fn work(&mut self,
-            root: &'e Element,
-            settings: &Settings,
-            _: &mut io::Write) -> io::Result<bool> {
-
+    fn work(
+        &mut self,
+        root: &'e Element,
+        settings: &Settings,
+        _: &mut io::Write,
+    ) -> io::Result<bool> {
         if let Element::Heading(ref heading) = *root {
-
             // is heading too deep?
             if heading.depth > settings.max_heading_depth {
                 self.push(max_depth_lint(settings, &heading.position));
@@ -84,9 +78,13 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckHeadings<'e> {
             let mut consistency_lint = None;
             {
                 // find parent heading
-                let parent = self.path.iter().rev().find(
-                    |e| if let Element::Heading(_) = ***e {**e != root} else {false}
-                );
+                let parent = self.path.iter().rev().find(|e| {
+                    if let Element::Heading(_) = ***e {
+                        **e != root
+                    } else {
+                        false
+                    }
+                });
 
                 if let Some(&&Element::Heading(ref parent)) = parent {
                     if heading.depth > parent.depth + 1 {

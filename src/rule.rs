@@ -1,8 +1,7 @@
-use mediawiki_parser::*;
-use settings::{Settings, RuleMeta};
 use lint::*;
+use mediawiki_parser::*;
+use settings::{RuleMeta, Settings};
 use std::io;
-
 
 /// Linter rule trait.
 pub trait Rule<'e, 's: 'e>: Traversion<'e, &'s Settings<'s>> + 'e {
@@ -122,7 +121,7 @@ macro_rules! rule_impl {
 }
 
 /// This object can be rendered by a traversion.
-pub trait Checkable  {
+pub trait Checkable {
     fn check<'e, 's>(
         &'e self,
         rule: &mut Rule<'e, 's>,
@@ -136,7 +135,6 @@ impl Checkable for Element {
         rule: &mut Rule<'e, 's>,
         settings: &'s Settings,
     ) -> io::Result<&Vec<Lint>> {
-
         rule.run(self, settings, &mut vec![])?;
         Ok(rule.lints())
     }

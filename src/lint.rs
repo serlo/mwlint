@@ -1,8 +1,7 @@
+use colored::*;
+use mediawiki_parser::*;
 use std::error;
 use std::fmt;
-use mediawiki_parser::*;
-use colored::*;
-
 
 /// Specifies an issue identified by the linter.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

@@ -5,19 +5,22 @@ extern crate structopt;
 extern crate mwlint;
 extern crate mwparser_utils;
 
-use std::process;
+use mwlint::*;
+use mwparser_utils::CachedTexChecker;
 use std::fs;
 use std::io;
 use std::path::PathBuf;
-use mwlint::*;
-use mwparser_utils::CachedTexChecker;
+use std::process;
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
-#[structopt(name = "mwlint", about = "This program \
-takes a yaml syntax tree of a mediawiki document \
-(as created by `mwtoast`) as input and checks it for for discouraged \
-patterns and other nitpicks.")]
+#[structopt(
+    name = "mwlint",
+    about = "This program \
+             takes a yaml syntax tree of a mediawiki document \
+             (as created by `mwtoast`) as input and checks it for for discouraged \
+             patterns and other nitpicks."
+)]
 struct Args {
     /// Dump the default settings to stdout.
     #[structopt(short = "d", long = "dump-config")]
@@ -38,26 +41,24 @@ fn main() -> Result<(), std::io::Error> {
 
     let mut settings = if let Some(path) = args.config {
         let file = fs::File::open(&path)?;
-        serde_yaml::from_reader(&file)
-            .expect("Error reading settings:")
+        serde_yaml::from_reader(&file).expect("Error reading settings:")
     } else {
         Settings::default()
     };
 
     if args.dump_config {
-        println!("{}", serde_yaml::to_string(&settings)
-            .expect("Could serialize settings!"));
+        println!(
+            "{}",
+            serde_yaml::to_string(&settings).expect("Could serialize settings!")
+        );
         process::exit(0);
     }
 
     if let Some(path) = args.texvccheck_path {
-        settings.tex_checker = Some(CachedTexChecker::new(
-            &path, 10_000
-        ));
+        settings.tex_checker = Some(CachedTexChecker::new(&path, 10_000));
     } else {
         eprintln!("Warning: no texvccheck path, won't perform checks!");
     }
-
 
     let mut root = if let Some(path) = args.input_file {
         let file = fs::File::open(&path)?;
@@ -66,8 +67,7 @@ fn main() -> Result<(), std::io::Error> {
         serde_yaml::from_reader(io::stdin())
     }.expect("Error reading input:");
 
-    root = normalize(root, &settings)
-        .expect("Input normalization error:");
+    root = normalize(root, &settings).expect("Input normalization error:");
 
     let mut rules = get_rules();
     let mut lints = vec![];
@@ -87,7 +87,9 @@ fn main() -> Result<(), std::io::Error> {
         }
     }
 
-    println!("{}", &serde_yaml::to_string(&lints)
-        .expect("could not serialize lints:"));
+    println!(
+        "{}",
+        &serde_yaml::to_string(&lints).expect("could not serialize lints:")
+    );
     Ok(())
 }

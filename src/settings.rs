@@ -1,4 +1,4 @@
-use mfnf_template_spec::{spec_meta::TemplateSpec, spec};
+use mfnf_template_spec::{spec, spec_meta::TemplateSpec};
 use mwparser_utils::CachedTexChecker;
 
 /// Rule metadata.
@@ -27,14 +27,9 @@ impl<'p> Default for Settings<'p> {
     fn default() -> Self {
         Settings {
             max_heading_depth: 4,
-            html_whitelist: vec![
-                "section".into(),
-                "dfn".into(),
-                "ref".into(),
-            ],
+            html_whitelist: vec!["section".into(), "dfn".into(), "ref".into()],
             tex_checker: None,
             template_spec: spec::<'p>(),
         }
     }
 }
-

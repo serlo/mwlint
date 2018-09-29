@@ -111,82 +111,74 @@ rule_impl!(CheckLists, "Checks for malformed lists"
     => LintKind::ListMixedType
 );
 
-fn term_without_def(
-    position: &Span,
-) -> Lint {
+fn term_without_def(position: &Span) -> Lint {
     Lint {
         position: position.clone(),
-        explanation:
-            "A defined term (;) must be followed by its \
-             definition (:)!".into(),
-        explanation_long:
-            "The ; and : elements mark definition lists. They should only be \
-             used for lists of terms and their corresponding definitions. \
-             Using it for indentation defeats its semantic meaning.".into(),
-        solution:
-            "Add a definition item (:) after the term or use a better \
-             formating. You may use a heading here or \
-             {{:Mathe für Nicht-Freaks: Vorlage:Beweisschritt|..}} for proof \
-             steps.".into(),
+        explanation: "A defined term (;) must be followed by its \
+                      definition (:)!"
+            .into(),
+        explanation_long: "The ; and : elements mark definition lists. They should only be \
+                           used for lists of terms and their corresponding definitions. \
+                           Using it for indentation defeats its semantic meaning."
+            .into(),
+        solution: "Add a definition item (:) after the term or use a better \
+                   formating. You may use a heading here or \
+                   {{:Mathe für Nicht-Freaks: Vorlage:Beweisschritt|..}} for proof \
+                   steps."
+            .into(),
         severity: Severity::Warning,
         kind: LintKind::DefinitionTermWithoutDef,
     }
 }
 
-fn def_without_term(
-    position: &Span,
-) -> Lint {
+fn def_without_term(position: &Span) -> Lint {
     Lint {
         position: position.clone(),
-        explanation:
-            "A definition (:) must be preceded by a definition \
-             term (;)!".into(),
-        explanation_long:
-            "The ; and : elements mark definition lists. They should only be \
-            used for lists of terms and their corresponding definitions. \
-            Using it for indentation defeats its semantic meaning.".into(),
-        solution:
-            "Add a term (;) before the definition or use a better formating. \
-             For example you can use `{{Formel|...}}` for formulas or \
-             {{-|...}} for important paragraphs.".into(),
+        explanation: "A definition (:) must be preceded by a definition \
+                      term (;)!"
+            .into(),
+        explanation_long: "The ; and : elements mark definition lists. They should only be \
+                           used for lists of terms and their corresponding definitions. \
+                           Using it for indentation defeats its semantic meaning."
+            .into(),
+        solution: "Add a term (;) before the definition or use a better formating. \
+                   For example you can use `{{Formel|...}}` for formulas or \
+                   {{-|...}} for important paragraphs."
+            .into(),
         severity: Severity::Warning,
         kind: LintKind::DefinitionWithoutTerm,
     }
 }
 
-fn list_one_element(
-    position: &Span,
-) -> Lint {
-     Lint {
+fn list_one_element(position: &Span) -> Lint {
+    Lint {
         position: position.clone(),
         explanation: "Each list should at least define two elements.".into(),
-        explanation_long:
-            "A list is a collection of elements. \
-            This list only contains one element. Maybe some items are missing \
-            or some other kind of markup should be used.".into(),
-        solution:
-            "Do you need a list here? You may use another markup. For lists \
-             with a longer paragraphs you can use the {{Liste|...}} \
-             template.".into(),
+        explanation_long: "A list is a collection of elements. \
+                           This list only contains one element. Maybe some items are missing \
+                           or some other kind of markup should be used."
+            .into(),
+        solution: "Do you need a list here? You may use another markup. For lists \
+                   with a longer paragraphs you can use the {{Liste|...}} \
+                   template."
+            .into(),
         severity: Severity::Info,
         kind: LintKind::ListOneElement,
     }
 }
 
-fn list_mixed_type(
-    position: &Span,
-) -> Lint {
+fn list_mixed_type(position: &Span) -> Lint {
     Lint {
         position: position.clone(),
-        explanation:
-            "Lists kinds (unordered, ordered, definition) should not be \
-             mixed!".into(),
-        explanation_long:
-            "Mediawiki allows mixed types of list items. This is discouraged, \
-             as it does not convey any universally understood meaning.".into(),
-        solution:
-            "Use consistent item types or split your list into several \
-             lists.".into(),
+        explanation: "Lists kinds (unordered, ordered, definition) should not be \
+                      mixed!"
+            .into(),
+        explanation_long: "Mediawiki allows mixed types of list items. This is discouraged, \
+                           as it does not convey any universally understood meaning."
+            .into(),
+        solution: "Use consistent item types or split your list into several \
+                   lists."
+            .into(),
         severity: Severity::Error,
         kind: LintKind::ListMixedType,
     }
@@ -202,16 +194,10 @@ fn term_to_def(kind: &ListItemKind) -> ListItemKind {
 }
 
 impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckLists<'e> {
-
     path_impl!();
 
-    fn work(&mut self,
-            root: &'e Element,
-            _: &Settings,
-            _: &mut io::Write) -> io::Result<bool> {
-
+    fn work(&mut self, root: &'e Element, _: &Settings, _: &mut io::Write) -> io::Result<bool> {
         if let Element::List(ref list) = *root {
-
             if list.content.len() == 1 {
                 self.push(list_one_element(&list.position));
             }
