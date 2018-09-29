@@ -17,7 +17,7 @@
     tt.className = "CodeMirror-lint-tooltip";
     tt.appendChild(content.cloneNode(true));
     document.body.appendChild(tt);
-	var anchor = e.path[0];
+	var anchor = e.target;
 	var updater = setInterval(position, 100);
 
     function position(e) {	  
