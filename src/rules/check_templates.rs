@@ -1,5 +1,7 @@
 use preamble::*;
 use mfnf_template_spec::{spec_of, parse_template, spec_meta, is_plain_text};
+#[cfg(feature = "web")]
+use mfnf_template_spec::html;
 
 rule_impl!(CheckTemplates, "Checks for the correct use of templates."
 => examples:
@@ -255,14 +257,25 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
 
             if let Some(template_spec) = spec_of(&template_name) {
 
+                // make platform-specific modifications to the lint.
+                #[allow(unused_variables)]
+                fn add_spec_lint<'e, 's: 'e>(rule: &mut Rule<'e, 's>, mut lint: Lint, spec: &spec_meta::TemplateSpec) {
+                    #[cfg(feature = "web")]
+                    {
+                        lint.solution.push_str("<br>");
+                        lint.solution.push_str(&html::template_description(&spec));
+                    }
+                    rule.push(lint)
+                }
+
                 if parse_template(&template).is_none() {
                     for arg_spec in &template_spec.attributes {
                         let exists = find_arg(&template.content, &arg_spec.names).is_some();
                         if !exists && arg_spec.priority == spec_meta::Priority::Required {
-                            self.push(missing_argument(
+                            add_spec_lint(self, missing_argument(
                                 &template.position,
                                 &arg_spec.default_name().trim().to_lowercase(),
-                            ));
+                            ), &template_spec);
                         }
                     }
                     return Ok(true);
