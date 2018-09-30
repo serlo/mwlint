@@ -1,20 +1,33 @@
-#![feature(use_extern_macros)]
-
 extern crate wasm_bindgen;
 extern crate mwlint;
 extern crate mediawiki_parser;
 extern crate serde_json;
+extern crate pulldown_cmark;
 
 #[macro_use]
 extern crate serde_derive;
 
 use wasm_bindgen::prelude::*;
 use mediawiki_parser::{MWError};
+use pulldown_cmark::{html, Parser};
 
 #[derive(Debug, Serialize)]
 enum LintResult {
     Lints(Vec<mwlint::Lint>),
     Error(MWError),
+}
+
+fn render_markdown(lint: &mut mwlint::Lint) {
+    fn render_string(input: &mut String) {
+        let clone = input.clone();
+        let parser = Parser::new(&clone);
+        input.clear();
+        html::push_html(input, parser);
+    }
+
+    render_string(&mut lint.explanation);
+    render_string(&mut lint.explanation_long);
+    render_string(&mut lint.solution);
 }
 
 /// Naive linter function. Outputs result as serialized JSON.
@@ -38,6 +51,11 @@ pub fn lint(input: &str) -> String {
                 .expect("error while checking rule!");
             lints.append(&mut rule.lints().iter().map(|l| l.clone()).collect())
         }
+
+        for mut lint in &mut lints {
+            render_markdown(&mut lint);
+        }
+
         LintResult::Lints(lints)
     });
 
