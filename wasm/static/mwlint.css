@@ -13,8 +13,8 @@
 
 .solution {
     color: green; 
-	font-size: large;
-	margin: .5em 0 .5em 0;
+    font-size: 12pt;
+    margin: .5em 0 .5em 0;
 }
 
 .explanation_long {
@@ -77,7 +77,7 @@
 
 .template-doc {
   color: black;
-  font-size: 10pt;
+  font-size: 10pt; 
 }
 
 .template-doc code {
@@ -88,8 +88,12 @@
   color: #d9534f;
 }
 .template-doc p {
-  margin-top: .1em;
-  margin-bottom: .1em;
+  margin-top: .2em;
+  margin-bottom: .2em;
+}
+
+.template-doc h2 {
+  font-size: 130%;
 }
 
 /* The lint marker gutter */
@@ -106,15 +110,13 @@
   overflow: hidden;
   padding: 2px 5px;
   position: fixed;
-  white-space: pre;
-  white-space: pre-wrap;
+  white-space: normal;
   z-index: 100;
   max-width: 600px;
   max-height: 50%;
   overflow-y: scroll;
   opacity: 1;
   transition: top .1s;
-  text-align: justify;
 }
 
 .CodeMirror-lint-mark-error, .CodeMirror-lint-mark-warning, .CodeMirror-lint-mark-info {
