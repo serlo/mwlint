@@ -2,10 +2,11 @@ extern crate mediawiki_parser;
 extern crate serde_yaml;
 #[macro_use]
 extern crate structopt;
+extern crate mfnf_template_spec;
 extern crate mwlint;
 extern crate mwparser_utils;
-extern crate mfnf_template_spec;
 
+use mfnf_template_spec::markdown;
 use mwlint::*;
 use mwparser_utils::CachedTexChecker;
 use std::fs;
@@ -13,7 +14,6 @@ use std::io;
 use std::path::PathBuf;
 use std::process;
 use structopt::StructOpt;
-use mfnf_template_spec::markdown;
 
 #[derive(Debug, StructOpt)]
 #[structopt(
