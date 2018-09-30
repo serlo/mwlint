@@ -19,7 +19,7 @@ pub struct Settings<'p> {
     #[serde(skip)]
     pub tex_checker: Option<CachedTexChecker>,
     /// Specification of allowed templates.
-    #[serde(skip_deserializing)]
+    #[serde(skip)]
     pub template_spec: Vec<TemplateSpec<'p>>,
 }
 
