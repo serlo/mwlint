@@ -156,17 +156,17 @@ fn illegal_content(
     Lint {
         position: position.clone(),
         explanation: format!(
-            "This markup is not allowed in the content of \"{}\": {}",
+            "This markup is not allowed in the content of `{}`: {}",
             argument_name, reason
         ),
         explanation_long: format!(
             "Some template arguments only allow certain kinds of text \
              in their content. In this case, the allowed values must \
-             fulfill the following property:\n{}",
+             fulfill the following property: `{}`",
             predicate_text
         ),
-        solution: "Take a look at the template specification or contact the main
-             authors to ask for help. Thanks!"
+        solution: "Take a look at the template documentation below or contact
+                   the main authors to ask for help."
             .into(),
         severity: Severity::Error,
         kind: LintKind::IllegalArgumentContent,
