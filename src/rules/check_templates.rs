@@ -266,8 +266,10 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
                 ) {
                     #[cfg(feature = "web")]
                     {
-                        lint.solution.push_str("<details><summary>Template Documentation:</summary>");
-                        lint.solution.push_str(&html::template_description(&spec, 1));
+                        lint.solution
+                            .push_str("<details><summary>Template Documentation:</summary>");
+                        lint.solution
+                            .push_str(&html::template_description(&spec, 1));
                         lint.solution.push_str("</details>");
                     }
                     rule.push(lint)
@@ -292,13 +294,17 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
 
                 let default_name = template_spec.default_name().trim().to_lowercase();
                 if template_name != default_name {
-                    self.push(deprecated_name(
-                        &template.position,
-                        &template_name,
-                        &default_name,
-                        "template",
-                        LintKind::DeprecatedTemplateName,
-                    ));
+                    add_spec_lint(
+                        self,
+                        deprecated_name(
+                            &template.position,
+                            &template_name,
+                            &default_name,
+                            "template",
+                            LintKind::DeprecatedTemplateName,
+                        ),
+                        &template_spec,
+                    );
                 }
 
                 for arg_spec in &template_spec.attributes {
@@ -309,25 +315,33 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
                     {
                         let actual_name = &arg.name;
                         if actual_name != &default_argname {
-                            self.push(deprecated_name(
-                                &arg.position,
-                                actual_name,
-                                &default_argname,
-                                "argument",
-                                LintKind::DeprecatedArgumentName,
-                            ));
+                            add_spec_lint(
+                                self,
+                                deprecated_name(
+                                    &arg.position,
+                                    actual_name,
+                                    &default_argname,
+                                    "argument",
+                                    LintKind::DeprecatedArgumentName,
+                                ),
+                                &template_spec,
+                            );
                         }
 
                         if let Err(error) = (arg_spec.predicate)(&arg.value) {
-                            self.push(illegal_content(
-                                error
-                                    .tree
-                                    .map(|e| e.get_position())
-                                    .unwrap_or(&arg.position),
-                                actual_name,
-                                &error.cause,
-                                &arg_spec.predicate_name,
-                            ));
+                            add_spec_lint(
+                                self,
+                                illegal_content(
+                                    error
+                                        .tree
+                                        .map(|e| e.get_position())
+                                        .unwrap_or(&arg.position),
+                                    actual_name,
+                                    &error.cause,
+                                    &arg_spec.predicate_name,
+                                ),
+                                &template_spec,
+                            );
                         }
                     }
                 }
