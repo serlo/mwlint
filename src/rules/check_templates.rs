@@ -75,7 +75,10 @@ fn template_not_allowed(position: &Span, name: &str) -> Lint {
         explanation_long: "Only a specific set of templates are allowed for this project. \
                            This rule is in place to make sure elements with the same \
                            meaning are recognized as such and formatted in the same way. We \
-                           also do only support some templates in our PDF-Export."
+                           also do only support some templates in our PDF-Export.
+
+                           For a list of allowed templates and examples see \
+                           [Formatierung von Kapiteln](https://de.wikibooks.org/wiki/Mathe_f%C3%BCr_Nicht-Freaks:_Formatierung_von_Kapiteln)."
             .into(),
         solution: format!(
             "Use another template. Maybe this is just a spelling \
@@ -131,17 +134,19 @@ fn missing_argument(position: &Span, name: &str) -> Lint {
     Lint {
         position: position.clone(),
         explanation: format!(
-            "The template argument {:?} is missing but \
-             required!",
+            "The template argument `{:?}` is missing but required!",
             name
         ),
         explanation_long: "This template has arguments to tell it what to do. These can be \
-                           given by named parameters like {{name|argument_name=value}}) and \
-                           by unnamed parameters as in {{name|value}}. Unnamed arguments \
+                           given by named parameters like `{{name|argument_name=value}}`) and \
+                           by unnamed parameters as in `{{name|value}}`. Unnamed arguments \
                            are equivalent to just enumerating named arguments: \
-                           ({{name|1=value}} <=> {{name|value}})"
+                           (`{{name|1=value}} <=> {{name|value}}`)"
             .into(),
-        solution: format!("Add a value for the argument \"{:?}\".", name),
+        solution: format!(
+            "Add a value for the argument \"{:?}\". (Also note the template documentation below)",
+            name
+        ),
         severity: Severity::Error,
         kind: LintKind::MissingTemplateArgument,
     }
