@@ -113,12 +113,11 @@ dependencies = [
 [[package]]
 name = "mfnf_template_spec"
 version = "0.1.0"
-source = "git+https://github.com/vroland/mfnf-template-spec.git#3f36a1202ab2c6ae9f69477796b43a038380c120"
+source = "git+https://github.com/vroland/mfnf-template-spec.git#dc021f2e6b42c8c459e9029399c8b0c247be4cab"
 dependencies = [
  "mediawiki_parser 0.3.9 (registry+https://github.com/rust-lang/crates.io-index)",
  "mwparser_utils 0.1.0 (git+https://github.com/vroland/mediawiki-parser-utils.git)",
  "mwparser_utils_derive 0.1.0 (git+https://github.com/vroland/mediawiki-parser-utils.git)",
- "pulldown-cmark 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.79 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.79 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
