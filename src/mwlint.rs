@@ -4,6 +4,7 @@ extern crate serde_yaml;
 extern crate structopt;
 extern crate mwlint;
 extern crate mwparser_utils;
+extern crate mfnf_template_spec;
 
 use mwlint::*;
 use mwparser_utils::CachedTexChecker;
@@ -12,6 +13,7 @@ use std::io;
 use std::path::PathBuf;
 use std::process;
 use structopt::StructOpt;
+use mfnf_template_spec::markdown;
 
 #[derive(Debug, StructOpt)]
 #[structopt(
@@ -23,8 +25,11 @@ use structopt::StructOpt;
 )]
 struct Args {
     /// Dump the default settings to stdout.
-    #[structopt(short = "d", long = "dump-config")]
+    #[structopt(long = "dump-config")]
     dump_config: bool,
+    /// Dump the template specification as markdown.
+    #[structopt(long = "dump-docs")]
+    dump_template_docs: bool,
     /// Path to the input file.
     #[structopt(parse(from_os_str), short = "i", long = "input")]
     input_file: Option<PathBuf>,
@@ -46,11 +51,21 @@ fn main() -> Result<(), std::io::Error> {
         Settings::default()
     };
 
+    // dump settings
     if args.dump_config {
         println!(
             "{}",
             serde_yaml::to_string(&settings).expect("Could serialize settings!")
         );
+        process::exit(0);
+    }
+
+    // dump template spec
+    if args.dump_template_docs {
+        println!("# Template Documentation\n");
+        for template in &settings.template_spec {
+            println!("{}\n", markdown::template_description(&template, 1));
+        }
         process::exit(0);
     }
 
