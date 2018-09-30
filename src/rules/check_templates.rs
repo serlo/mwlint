@@ -71,12 +71,11 @@ rule_impl!(CheckTemplates, "Checks for the correct use of templates."
 fn template_not_allowed(position: &Span, name: &str) -> Lint {
     Lint {
         position: position.clone(),
-        explanation: format!("The template \"{:?}\" is not allowed / specified!", name),
+        explanation: format!("The template `{:?}` is not allowed / specified!", name),
         explanation_long: "Only a specific set of templates are allowed for this project. \
                            This rule is in place to make sure elements with the same \
                            meaning are recognized as such and formatted in the same way. We \
-                           also do only support some templates in our PDF-Export.
-
+                           also do only support some templates in our PDF-Export. \n\n\
                            For a list of allowed templates and examples see \
                            [Formatierung von Kapiteln](https://de.wikibooks.org/wiki/Mathe_f%C3%BCr_Nicht-Freaks:_Formatierung_von_Kapiteln)."
             .into(),
