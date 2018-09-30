@@ -261,13 +261,14 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
                 #[allow(unused_variables)]
                 fn add_spec_lint<'e, 's: 'e>(
                     rule: &mut Rule<'e, 's>,
-                    mut lint: Lint,
+                    lint: Lint,
                     spec: &spec_meta::TemplateSpec,
                 ) {
                     #[cfg(feature = "web")]
                     {
-                        lint.solution.push_str("<br>");
-                        lint.solution.push_str(&html::template_description(&spec));
+                        lint.solution.push_str("<details><summary>Template Documentation:</summary>");
+                        lint.solution.push_str(&html::template_description(&spec, 1));
+                        lint.solution.push_str("</details>");
                     }
                     rule.push(lint)
                 }
