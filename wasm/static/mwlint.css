@@ -73,6 +73,7 @@
 	border-style: solid;
 	border-width: 1px;
 	padding: 10px;
+    white-space: pre;
 }
 
 .template-doc {
