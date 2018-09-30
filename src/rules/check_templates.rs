@@ -1,5 +1,5 @@
 #[cfg(feature = "web")]
-use mfnf_template_spec::html;
+use mfnf_template_spec::markdown;
 use mfnf_template_spec::{is_plain_text, parse_template, spec_meta, spec_of};
 use preamble::*;
 
@@ -258,10 +258,10 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
 
             if let Some(template_spec) = spec_of(&template_name) {
                 // make platform-specific modifications to the lint.
-                #[allow(unused_variables)]
+                #[allow(unused_variables, unused_mut)]
                 fn add_spec_lint<'e, 's: 'e>(
                     rule: &mut Rule<'e, 's>,
-                    lint: Lint,
+                    mut lint: Lint,
                     spec: &spec_meta::TemplateSpec,
                 ) {
                     #[cfg(feature = "web")]
@@ -269,7 +269,7 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
                         lint.solution
                             .push_str("<details><summary>Template Documentation:</summary>");
                         lint.solution
-                            .push_str(&html::template_description(&spec, 1));
+                            .push_str(&markdown::template_description(&spec, 1));
                         lint.solution.push_str("</details>");
                     }
                     rule.push(lint)
