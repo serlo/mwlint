@@ -12,13 +12,13 @@ function add_script(url) {
 };
 
 if (mw.config.get("wgPageName").startsWith("Mathe_für_Nicht-Freaks:") && document.getElementById("wpTextbox1") != null) {
-	var linter = add_script('https://tools-static.wmflabs.org/mwlint/wasm/mwlint_wasm.js').then(() => {
-		return window.wasm_bindgen('https://tools.wmflabs.org/mwlint/static/wasm/mwlint_wasm_bg.wasm');
+	var linter = add_script('https://mathe-builds.serlo.org/mwlint/mwlint_wasm.js').then(() => {
+		return window.wasm_bindgen('https://mathe-builds.serlo.org/mwlint/mwlint_wasm_bg.wasm');
 	});
-  add_script('https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/codemirror.min.js').then(() => {
+    add_script('https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/codemirror.min.js').then(() => {
     mw.loader.load('https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/codemirror.min.css', 'text/css');
     
-    var lint_addon = add_script('https://tools-static.wmflabs.org/mwlint/lint.js');
+    var lint_addon = add_script('https://mathe-builds.serlo.org/mwlint/lint.js');
     var markdown = add_script('https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/mode/markdown/markdown.min.js');
     var brackets= add_script('https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/addon/edit/matchbrackets.min.js');
     var active_line = add_script('https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/addon/selection/active-line.min.js');
