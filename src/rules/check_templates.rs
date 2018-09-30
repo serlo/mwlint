@@ -267,7 +267,7 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
                     #[cfg(feature = "web")]
                     {
                         lint.solution
-                            .push_str("<details><summary>Template Documentation:</summary>\n");
+                            .push_str("<details class=\"template-doc\"><summary>Template Documentation:</summary>\n");
                         lint.solution
                             .push_str(&markdown::template_description(&spec, 1));
                         lint.solution.push_str("\n</details>");
