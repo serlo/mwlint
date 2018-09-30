@@ -80,13 +80,6 @@
   font-size: 10pt; 
 }
 
-.template-doc code {
-  border-style: solid;
-  border-width: 1px;
-  border-color: lightgray;
-  border-radius: 2px 2px 2px 2px;
-  color: #d9534f;
-}
 .template-doc p {
   margin-top: .2em;
   margin-bottom: .2em;
@@ -99,6 +92,14 @@
 /* The lint marker gutter */
 .CodeMirror-lint-markers {
   width: 16px;
+}
+
+.CodeMirror-lint-tooltip code {
+  border-style: solid;
+  border-width: 1px;
+  border-color: lightgray;
+  border-radius: 2px 2px 2px 2px;
+  color: #d9534f;
 }
 
 .CodeMirror-lint-tooltip {
