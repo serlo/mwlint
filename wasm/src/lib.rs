@@ -17,17 +17,24 @@ enum LintResult {
     Error(MWError),
 }
 
-fn render_markdown(lint: &mut mwlint::Lint) {
-    fn render_string(input: &mut String) {
-        let clone = input.clone();
-        let parser = Parser::new(&clone);
-        input.clear();
-        html::push_html(input, parser);
-    }
+fn render_string(input: &mut String) {
+    let clone = input.clone();
+    let parser = Parser::new(&clone);
+    input.clear();
+    html::push_html(input, parser);
+}
 
+fn render_lint(lint: &mut mwlint::Lint) {
     render_string(&mut lint.explanation);
     render_string(&mut lint.explanation_long);
     render_string(&mut lint.solution);
+}
+
+fn render_example(example: &mut mwlint::Example) {
+    render_string(&mut example.bad_explanation);
+    render_string(&mut example.good_explanation);
+    example.good = format!("<pre><code>{}</code></pre>", &example.good);
+    example.bad = format!("<pre><code>{}</code></pre>", &example.bad);
 }
 
 /// Naive linter function. Outputs result as serialized JSON.
@@ -53,7 +60,7 @@ pub fn lint(input: &str) -> String {
         }
 
         for mut lint in &mut lints {
-            render_markdown(&mut lint);
+            render_lint(&mut lint);
         }
 
         LintResult::Lints(lints)
@@ -67,10 +74,20 @@ pub fn lint(input: &str) -> String {
 #[wasm_bindgen]
 pub fn examples() -> String {
     let rules = mwlint::get_rules();
-    let examples = rules.iter().fold(vec![], |mut vec, rule| {
-        vec.append(&mut rule.examples().clone());
-        vec
-    });
+    let examples = rules
+        .iter()
+        .fold(vec![], |mut vec, rule| {
+            let mut rule_examples = rule.examples()
+                .iter()
+                .map(|example| {
+                    let mut e = example.clone();
+                    render_example(&mut e);
+                    e
+                })
+                .collect();
+            vec.append(&mut rule_examples);
+            vec
+        });
 
     serde_json::to_string(&examples)
         .expect("could not serialize examples")

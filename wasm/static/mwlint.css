@@ -67,13 +67,7 @@
 }
 
 .example-good, .example-bad {
-	font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
-	color: gray;
-	margin: .25em;
-	border-style: solid;
-	border-width: 1px;
-	padding: 10px;
-    white-space: pre;
+
 }
 
 .template-doc {
@@ -96,6 +90,7 @@
 }
 
 .CodeMirror-lint-tooltip code {
+  font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
   border-style: solid;
   border-width: 1px;
   border-color: lightgray;

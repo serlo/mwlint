@@ -205,11 +205,11 @@ function init_editor() {
                 var example = examples[j];
                 example_html = example_html + "<div class=\"example\">" +
                   "<div class=\"example-bad-tag\">bad:</div>" +
-                  "<div class=\"example-bad\">" + escapeHtml(example.bad) + "</div>" +
+                  "<div class=\"example-bad\">" + example.bad + "</div>" +
                   "<div class=\"example-bad-expl\">" + example.bad_explanation + "</div>" +
                   "<div class=\"example-good-tag\">good:</div>" +
 
-                  "<div class=\"example-good\">" + escapeHtml(example.good) + "</div>" +
+                  "<div class=\"example-good\">" + example.good + "</div>" +
                   "<div class=\"example-good-expl\">" + example.good_explanation + "</div>" +
                   "</div>"
               }
@@ -219,7 +219,7 @@ function init_editor() {
                 to: CodeMirror.Pos(lint.position.end.line - 1, lint.position.end.col - 1),
                 messageHTML: "<div class=\"explanation explanation-" + lint.severity +
                   "\">" + lint.explanation + "</div>" +
-                  "<div class=\"solution\">" + "&#8618; " + lint.solution + "</div>" +
+                  "<div class=\"solution\">" + lint.solution + "</div>" +
                   "<div class=\"explanation_long\">" + lint.explanation_long + "</div>" +
 				  "<hr class=\"example-sep\">" + 
                   "<div class=\"example-container\">" +
