@@ -10,7 +10,7 @@ rule_impl!(CheckTemplates, "Checks for the correct use of templates."
     "The template `unknown template` is not allowed or specified for this \
      project.",
     "{{Formel|<math>1+1=2</math>}}",
-    "The {{Formel|...}} template exists and is used properly."
+    "The `{{Formel|...}}` template exists and is used properly."
     => LintKind::TemplateNotAllowed
 ;
     formatted_template_name,
@@ -18,31 +18,32 @@ rule_impl!(CheckTemplates, "Checks for the correct use of templates."
     "This template's name contains a template, which can lead to problems \
      with other tools.",
     "{{Formel|<math>x^2</math>}}",
-    "To ensure compatibility, only use alphanumeric characters plus _,.,: and \
-     white spaces."
+    "To ensure compatibility, only use alphanumeric characters plus `_,.,:` and \
+     white space."
     => LintKind::InvalidTemplateName
 ;
     deprecated_template_name,
     "{{Hinweis|Important remark}}",
     "This template used to be called `Hinweis`. However we use the template \
-     {{:Mathe für Nicht-Freaks: Vorlage:Hinweis|...}} in this project since \
+     `{{:Mathe für Nicht-Freaks: Vorlage:Hinweis|...}}` in this project since \
      we have a personalized formating for it.",
     "{{:Mathe für Nicht-Freaks: Vorlage:Hinweis|Important remark}}",
     "Our naming conventions are used."
     => LintKind::DeprecatedTemplateName
 ;
     deprecated_arg_name,
-    "{{Formel|formel=<math>x^2</math>}}",
-    "Calling this template with a named argument is unecessarily verbose.",
-    "{{Formel|<math>x^2</math>}}",
-    "The template is called with unnamed parameters."
+    "{{greeting|greeting_to_user=Hello World}}",
+    "The argument `greeting_to_user` has been renamed to `greeting` \
+    The old name should not be used any more.`",
+    "{{greeting|greeting=Hello World}}",
+    "The template is called with the new argument name."
     => LintKind::DeprecatedArgumentName
 ;
     missing_arg,
     "{{Formel}}",
-    "The {{Formel|...}} template needs a parameter for the formula.",
+    "The `{{Formel|...}}` template needs a parameter for the formula.",
     "{{Formel|<math>x^2</math>}}",
-    "The required unnamed argument \"1\" with the formula is given."
+    "The required unnamed argument `1` with the formula is given."
     => LintKind::MissingTemplateArgument
 ;
     illegal_argument_greeting,
@@ -62,7 +63,7 @@ rule_impl!(CheckTemplates, "Checks for the correct use of templates."
 ;
     illegal_section_name,
     "{{#lst:Mathe für Nicht-Freaks: Example|\"section name\"}}",
-    "The name of an included section is enclosed in \" or \'.",
+    "The name of an included section is enclosed in `\"` or `\'`.",
     "{{#lst:Mathe für Nicht-Freaks: Example|section name}}",
     "The section name is written in plain text."
     => LintKind::IllegalSectionName
