@@ -103,6 +103,20 @@
   color: #d9534f;
 }
 
+.CodeMirror-lint-tooltip pre code {
+  white-space: pre;
+  color: inherit;
+  border: 0;
+  padding: 0;
+}
+
+
+.CodeMirror-lint-tooltip pre {
+  border: 1px solid lightgray;
+  color: #333;
+  border-radius: 4px;
+}
+
 .CodeMirror-lint-tooltip {
   background-color: #fff;
   border: 1px solid blue;
