@@ -140,10 +140,10 @@ fn missing_argument(position: &Span, name: &str) -> Lint {
                            given by named parameters like `{{name|argument_name=value}}`) and \
                            by unnamed parameters as in `{{name|value}}`. Unnamed arguments \
                            are equivalent to just enumerating named arguments: \
-                           ``` \
+                           ```\
                            {{name|1=value}} \
                            <!-- is equal to --> \
-                           {{name|value}}` \
+                           {{name|value}} \
                            ```"
             .into(),
         solution: format!(
