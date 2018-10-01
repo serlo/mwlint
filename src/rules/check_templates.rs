@@ -366,12 +366,16 @@ impl<'e, 's> Traversion<'e, &'s Settings<'s>> for CheckTemplates<'e> {
                             .any(|arg_spec| arg_spec.names.contains(&name));
 
                         if !has_spec {
-                            self.push(illegal_argument(
-                                &arg.position,
-                                &name,
-                                &template_name,
-                                allowed_args.as_slice(),
-                            ));
+                            add_spec_lint(
+                                self,
+                                illegal_argument(
+                                    &arg.position,
+                                    &name,
+                                    &template_name,
+                                    allowed_args.as_slice(),
+                                ),
+                                &template_spec,
+                            );
                         }
                     }
                 }
