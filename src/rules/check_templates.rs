@@ -71,7 +71,7 @@ rule_impl!(CheckTemplates, "Checks for the correct use of templates."
 fn template_not_allowed(position: &Span, name: &str) -> Lint {
     Lint {
         position: position.clone(),
-        explanation: format!("The template `{:?}` is not allowed / specified!", name),
+        explanation: format!("The template `{}` is not allowed / specified!", name),
         explanation_long: "Only a specific set of templates are allowed for this project. \
                            This rule is in place to make sure elements with the same \
                            meaning are recognized as such and formatted in the same way. We \
@@ -82,7 +82,7 @@ fn template_not_allowed(position: &Span, name: &str) -> Lint {
         solution: format!(
             "Use another template. Maybe this is just a spelling \
              mistake? You can also contact the main authors so that \
-             they add the template \"{:?}\" to the project \
+             they add the template `{}` to the project \
              specification.",
             name
         ),
@@ -98,7 +98,7 @@ fn invalid_template_name(position: &Span) -> Lint {
         explanation_long: "Using text markup or even block elements in template names may \
                            cause unexpected behaviour and incompatibilities with external \
                            tools we use. Good template names are expressive, easy to type \
-                           and consist of only alphanumerical characters plus _,.,: ."
+                           and consist of only alphanumerical characters plus `_,.,:` ."
             .into(),
         solution: "Use better template names.".into(),
         severity: Severity::Error,
@@ -115,7 +115,7 @@ fn deprecated_name(
 ) -> Lint {
     Lint {
         position: position.clone(),
-        explanation: format!("The {} name {} is deprecated!", objtext, used),
+        explanation: format!("The {} name `{}` is deprecated!", objtext, used),
         explanation_long: format!(
             "For some {}s, the name they are referred to changes over time. \
              To make the transition easier, old and new names are allowed. \
@@ -123,7 +123,7 @@ fn deprecated_name(
              future. Please use the new name.",
             objtext, objtext
         ),
-        solution: format!("Use \"{}\" instead of \"{}\".", better, used),
+        solution: format!("Use `{}` instead of `{}`.", better, used),
         severity: Severity::Info,
         kind,
     }
@@ -133,17 +133,19 @@ fn missing_argument(position: &Span, name: &str) -> Lint {
     Lint {
         position: position.clone(),
         explanation: format!(
-            "The template argument `{:?}` is missing but required!",
+            "The template argument `{}` is missing but required!",
             name
         ),
         explanation_long: "This template has arguments to tell it what to do. These can be \
                            given by named parameters like `{{name|argument_name=value}}`) and \
                            by unnamed parameters as in `{{name|value}}`. Unnamed arguments \
                            are equivalent to just enumerating named arguments: \
-                           (`{{name|1=value}} <=> {{name|value}}`)"
+                           ``` \
+                           (`{{name|1=value}} <=> {{name|value}}`)" \
+                           ``` \
             .into(),
         solution: format!(
-            "Add a value for the argument \"{:?}\". (Also note the template documentation below)",
+            "Add a value for the argument `{}`. (Also note the template documentation below)",
             name
         ),
         severity: Severity::Error,
@@ -186,13 +188,18 @@ fn illegal_argument(
     Lint {
         position: position.clone(),
         explanation: format!(
-            "The argument \"{:?}\" is not allowed for the \
-             template \"{:?}\"",
+            "The argument `{}` is not allowed for the \
+             template `{}`",
             argument_name, template_name
         ),
         explanation_long: format!(
-            "{:?} only allows the following arguments:\n{:?}",
-            template_name, allowed
+            "`` only allows the following arguments: {}",
+            template_name,
+            &allowed
+                .iter()
+                .map(|s| format!("`{}`", s))
+                .collect::<Vec<String>>()
+                .join(", ")
         ),
         solution: "Only use the allowed template arguments.".into(),
         severity: Severity::Warning,
@@ -205,8 +212,8 @@ fn illegal_section(position: &Span, message: &str) -> Lint {
         position: position.clone(),
         explanation: message.into(),
         explanation_long: format!(
-            "A section inclusion must be of the format {{#lst:<article name>|<section_name>}}\n\
-             with <article_name> and <section_name> beeing plain text (without quotes!)"
+            "A section inclusion must be of the format `{{#lst:<article name>|<section_name>}}`\n\
+             with `<article_name>` and `<section_name>` beeing plain text (without quotes!)"
         ),
         solution: "Only use the allowed template arguments.".into(),
         severity: Severity::Error,
