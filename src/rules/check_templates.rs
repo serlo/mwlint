@@ -195,7 +195,7 @@ fn illegal_argument(
             argument_name, template_name
         ),
         explanation_long: format!(
-            "`` only allows the following arguments: {}",
+            "`{}` only allows the following arguments: {}",
             template_name,
             &allowed
                 .iter()
