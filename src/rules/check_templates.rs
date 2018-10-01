@@ -139,11 +139,11 @@ fn missing_argument(position: &Span, name: &str) -> Lint {
         explanation_long: "This template has arguments to tell it what to do. These can be \
                            given by named parameters like `{{name|argument_name=value}}`) and \
                            by unnamed parameters as in `{{name|value}}`. Unnamed arguments \
-                           are equivalent to just enumerating named arguments: \
-                           ```\
-                           {{name|1=value}} \
-                           <!-- is equal to --> \
-                           {{name|value}} \
+                           are equivalent to just enumerating named arguments: \n\
+                           ```\n\
+                           {{name|1=value}} \n\
+                           <!-- is equal to --> \n\
+                           {{name|value}} \n\
                            ```"
             .into(),
         solution: format!(
