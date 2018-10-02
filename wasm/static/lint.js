@@ -1,255 +1,254 @@
-// CodeMirror, copyright (c) by Marijn Haverbeke and others
-// Distributed under an MIT license: https://codemirror.net/LICENSE
+var mwlint_examples = [];
 
-(function(mod) {
-  if (typeof exports == "object" && typeof module == "object") // CommonJS
-    mod(require("../../lib/codemirror"));
-  else if (typeof define == "function" && define.amd) // AMD
-    define(["../../lib/codemirror"], mod);
-  else // Plain browser env
-    mod(CodeMirror);
-})(function(CodeMirror) {
-  "use strict";
-  var GUTTER_ID = "CodeMirror-lint-markers";
+function add_script(url) {
+    return new Promise((resolve, reject) => {
+        var script = document.createElement('script');
+        document.body.appendChild(script);
+        script.onload = resolve;
+        script.onerror = reject;
+        script.async = true;
+        script.src = url;
+    })
+};
 
-  function showTooltip(e, content) {
-    var tt = document.createElement("div");
-    tt.className = "CodeMirror-lint-tooltip";
-    tt.appendChild(content.cloneNode(true));
-    document.body.appendChild(tt);
-	var anchor = e.target;
-	var updater = setInterval(position, 100);
+if (mw.config.get("wgPageName").startsWith("Mathe_für_Nicht-Freaks:") && document.getElementById("wpTextbox1") != null) {
+	var linter = add_script('https://mathe-builds.serlo.org/mwlint/mwlint_wasm.js').then(() => {
+		return window.wasm_bindgen('https://mathe-builds.serlo.org/mwlint/mwlint_wasm_bg.wasm');
+	});
 
-    function position(e) {	  
-      if (!tt.parentNode) return clearInterval(updater);
-	  var pos = anchor.getBoundingClientRect();
-      tt.style.top = (pos.y - tt.offsetHeight - 5) + "px";
-      tt.style.left = (pos.x + 5) + "px";
-    }
-    position(e);
+    function load_cm_plugins() {
+       var lint_addon = add_script('https://mathe-builds.serlo.org/mwlint/lint.js');
+       var markdown = add_script('https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/mode/markdown/markdown.min.js');
+       var brackets= add_script('https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/addon/edit/matchbrackets.min.js');
+       var active_line = add_script('https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/addon/selection/active-line.min.js');
+       Promise.all([lint_addon, markdown, brackets, active_line, linter]).then((values) => {
+         // remove syntax highlight tool
+           $( '#wpTextbox1' ).wikiEditor( 'removeFromToolbar', {
+            'section': 'main',
+            'group': 'codemirror',
+           });
 
-    if (tt.style.opacity != null) tt.style.opacity = 1;
-    return tt;
-  }
-  function rm(elt) {
-    if (elt.parentNode) elt.parentNode.removeChild(elt);
-  }
-  function hideTooltip(tt) {
-    if (!tt.parentNode) return;
-    if (tt.style.opacity == null) rm(tt);
-    tt.style.opacity = 0;
-    setTimeout(function() { rm(tt); }, 600);
-  }
-
-  function showTooltipFor(e, content, node) {
-    var tooltip = showTooltip(e, content);
-    function hide(e) {
-	  var bounds = tooltip.getBoundingClientRect()
-      if (e.clientX >= bounds.left && e.clientX <= bounds.right
-		&& e.clientY >= bounds.top && e.clientY <= bounds.bottom) return;
-
-      CodeMirror.off(document, "mousedown", hide);
-      if (tooltip) { hideTooltip(tooltip); tooltip = null; }
-    }
-    CodeMirror.on(document, "mousedown", hide);
-  }
-
-  function LintState(cm, options, hasGutter) {
-    this.marked = [];
-    this.options = options;
-    this.timeout = null;
-    this.hasGutter = hasGutter;
-    this.onClick = function(e) { return onClick(cm, e); };
-    this.waitingFor = 0
-  }
-
-  function parseOptions(_cm, options) {
-    if (options instanceof Function) return {getAnnotations: options};
-    if (!options || options === true) options = {};
-    return options;
-  }
-
-  function clearMarks(cm) {
-    var state = cm.state.lint;
-    if (state.hasGutter) cm.clearGutter(GUTTER_ID);
-    for (var i = 0; i < state.marked.length; ++i)
-      state.marked[i].clear();
-    state.marked.length = 0;
-  }
-
-  function makeMarker(labels, severity, multiple, tooltips) {
-    var marker = document.createElement("div"), inner = marker;
-    marker.className = "CodeMirror-lint-marker-" + severity;
-    if (multiple) {
-      inner = marker.appendChild(document.createElement("div"));
-      inner.className = "CodeMirror-lint-marker-multiple";
+           mwlint_examples = JSON.parse(window.wasm_bindgen.examples());
+           init_editor();
+       });
     }
 
-    if (tooltips != false) CodeMirror.on(inner, "click", function(e) {
-      showTooltipFor(e, labels, inner);
+    // cm already loaded through editor style
+    if (CodeMirror != undefined) {
+	console.log("mwlint: using wiki codemirror");
+	load_cm_plugins();
+    } else {
+	var cm_url = 'https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/codemirror.min.js';
+        add_script(cm_url).then(() => {
+           load_cm_plugins();
+	});
+    }
+};
+
+function init_editor() {
+  register_mfnf_extensions();
+
+  var wikiEditorToolbarEnabled, useCodeMirror, codeMirror;
+
+  var entityMap = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+    '/': '&#x2F;',
+    '`': '&#x60;',
+    '=': '&#x3D;'
+  };
+
+  function escapeHtml(string) {
+    return String(string).replace(/[&<>"'`=\/]/g, function(s) {
+      return entityMap[s];
     });
-
-    return marker;
   }
 
-  function getMaxSeverity(a, b) {
-    if (a == "error") return a;
-    else return b;
+  function build_parse_lint(err) {
+    var expected = escapeHtml(err.expected.join(", "));
+    return {
+      position: {
+        start: {
+          line: err.position.line,
+          col: err.position.col,
+        },
+        end: {
+          line: err.position.line,
+          col: err.position.col,
+        }
+      },
+      severity: "error",
+      explanation_long: "A syntax error occurs when there are mistakes in your code which make it impossible for analyse you document. These are often missing closing brackets and the likes. Also check the surrounding code, as the mistake might have happend before or after the given position.",
+      explanation: "Syntax error!",
+      solution: "Expected one of: " + expected,
+    };
   }
 
-  function groupByLine(annotations) {
-    var lines = [];
-    for (var i = 0; i < annotations.length; ++i) {
-      var ann = annotations[i], line = ann.from.line;
-      (lines[line] || (lines[line] = [])).push(ann);
-    }
-    return lines;
+  function build_transformation_lint(err) {
+    return {
+      severity: "error",
+      explanation_long: "A transformation error occurs when a document could not be properly processed after parsing. This can occur if you have a peculiar heading or list structure.",
+      explanation: err.cause,
+      position: err.position,
+      solution: "somehow this document does not conform with the usual document structure...",
+    };
   }
 
-  function annotationTooltip(ann) {
-    var severity = ann.severity;
-    if (!severity) severity = "error";
-    var tip = document.createElement("div");
-    tip.className = "CodeMirror-lint-message-" + severity;
-    if (typeof ann.messageHTML != 'undefined') {
-        tip.innerHTML = ann.messageHTML;
-    } else {
-        tip.appendChild(document.createTextNode(ann.message));
-    }
-    return tip;
-  }
+  function fetch_lints(source) {
+    return new Promise(function(resolve, reject) {
+      var result = JSON.parse(window.wasm_bindgen.lint(source));
+      // errors
+      if (result.hasOwnProperty("Err")) {
 
-  function lintAsync(cm, getAnnotations, passOptions) {
-    var state = cm.state.lint
-    var id = ++state.waitingFor
-    function abort() {
-      id = -1
-      cm.off("change", abort)
-    }
-    cm.on("change", abort)
-    getAnnotations(cm.getValue(), function(annotations, arg2) {
-      cm.off("change", abort)
-      if (state.waitingFor != id) return
-      if (arg2 && annotations instanceof CodeMirror) annotations = arg2
-      cm.operation(function() {updateLinting(cm, annotations)})
-    }, passOptions, cm);
-  }
+        // parse error
+        if (result.Err.Error.hasOwnProperty("parseerror")) {
+          resolve([build_parse_lint(result.Err.Error.parseerror)]);
+        }
 
-  function startLinting(cm) {
-    var state = cm.state.lint, options = state.options;
-    /*
-     * Passing rules in `options` property prevents JSHint (and other linters) from complaining
-     * about unrecognized rules like `onUpdateLinting`, `delay`, `lintOnChange`, etc.
-     */
-    var passOptions = options.options || options;
-    var getAnnotations = options.getAnnotations || cm.getHelper(CodeMirror.Pos(0, 0), "lint");
-    if (!getAnnotations) return;
-    if (options.async || getAnnotations.async) {
-      lintAsync(cm, getAnnotations, passOptions)
-    } else {
-      var annotations = getAnnotations(cm.getValue(), passOptions, cm);
-      if (!annotations) return;
-      if (annotations.then) annotations.then(function(issues) {
-        cm.operation(function() {updateLinting(cm, issues)})
-      });
-      else cm.operation(function() {updateLinting(cm, annotations)})
-    }
-  }
-
-  function updateLinting(cm, annotationsNotSorted) {
-    clearMarks(cm);
-    var state = cm.state.lint, options = state.options;
-
-    var annotations = groupByLine(annotationsNotSorted);
-
-    for (var line = 0; line < annotations.length; ++line) {
-      var anns = annotations[line];
-      if (!anns) continue;
-
-      var maxSeverity = null;
-      var tipLabel = state.hasGutter && document.createDocumentFragment();
-
-      for (var i = 0; i < anns.length; ++i) {
-        var ann = anns[i];
-        var severity = ann.severity;
-        if (!severity) severity = "error";
-        maxSeverity = getMaxSeverity(maxSeverity, severity);
-
-        if (options.formatAnnotation) ann = options.formatAnnotation(ann);
-        if (state.hasGutter) tipLabel.appendChild(annotationTooltip(ann));
-
-        if (ann.to) state.marked.push(cm.markText(ann.from, ann.to, {
-          className: "CodeMirror-lint-mark-" + severity,
-          __annotation: ann
-        }));
+        // transformation errors
+        if (result.Err.Error.hasOwnProperty("transformationerror")) {
+          resolve([build_transformation_lint(
+            result.Err.Error.transformationerror
+          )]);
+        }
       }
 
-      if (state.hasGutter)
-        cm.setGutterMarker(line, GUTTER_ID, makeMarker(tipLabel, maxSeverity, anns.length > 1,
-                                                       state.options.tooltips));
-    }
-    if (options.onUpdateLinting) options.onUpdateLinting(annotationsNotSorted, annotations, cm);
+      // lints
+      if (result.hasOwnProperty("Ok")) {
+        resolve(result.Ok.Lints);
+      }
+      reject([]);
+    });
   }
 
-  function onChange(cm) {
-    var state = cm.state.lint;
-    if (!state) return;
-    clearTimeout(state.timeout);
-    state.timeout = setTimeout(function(){startLinting(cm);}, state.options.delay || 500);
+  function get_examples(kind) {
+    var result = [];
+    for (var index = 0; index < mwlint_examples.length; index++) {
+      var example = mwlint_examples[index];
+      if (example.kind == kind) {
+        result.push(example);
+      }
+    }
+    return result;
   }
 
-  function popupTooltips(annotations, e) {
-    var target = e.target || e.srcElement;
-    var tooltip = document.createDocumentFragment();
-    for (var i = 0; i < annotations.length; i++) {
-      var ann = annotations[i];
-      tooltip.appendChild(annotationTooltip(ann));
-    }
-    showTooltipFor(e, tooltip, target);
-  }
-
-  function onClick(cm, e) {
-    var target = e.target || e.srcElement;
-    if (!/\bCodeMirror-lint-mark-/.test(target.className)) return;
-    var box = target.getBoundingClientRect(), x = (box.left + box.right) / 2, y = (box.top + box.bottom) / 2;
-    var spans = cm.findMarksAt(cm.coordsChar({left: e.clientX, top: e.clientY}, "client"));
-
-    var annotations = [];
-    for (var i = 0; i < spans.length; ++i) {
-      var ann = spans[i].__annotation;
-      if (ann) annotations.push(ann);
-    }
-    if (annotations.length) popupTooltips(annotations, e);
-	// do not show context menu on right click
-	if (e.preventDefault) {
-	  e.preventDefault();
-	}
-  }
-
-  CodeMirror.defineOption("lint", false, function(cm, val, old) {
-    if (old && old != CodeMirror.Init) {
-      clearMarks(cm);
-      if (cm.state.lint.options.lintOnChange !== false)
-        cm.off("change", onChange);
-      CodeMirror.off(cm.getWrapperElement(), "contextmenu", cm.state.lint.onClick);
-      clearTimeout(cm.state.lint.timeout);
-      delete cm.state.lint;
-    }
-
-    if (val) {
-      var gutters = cm.getOption("gutters"), hasLintGutter = false;
-      for (var i = 0; i < gutters.length; ++i) if (gutters[i] == GUTTER_ID) hasLintGutter = true;
-      var state = cm.state.lint = new LintState(cm, parseOptions(cm, val), hasLintGutter);
-      if (state.options.lintOnChange !== false)
-        cm.on("change", onChange);
-      if (state.options.tooltips != false && state.options.tooltips != "gutter")
-        CodeMirror.on(cm.getWrapperElement(), "contextmenu", state.onClick);
-
-      startLinting(cm);
-    }
+  codeMirror = CodeMirror.fromTextArea(document.getElementById("wpTextbox1"), {
+    lineNumbers: true,
+    autofocus: true,
+    styleActiveLine: true,
+    matchBrackets: true,
+    gutters: ["CodeMirror-lint-markers"],
+    lint: true,
+    mode: "markdown",
+    viewportMargin: Infinity,
   });
 
-  CodeMirror.defineExtension("performLint", function() {
-    if (this.state.lint) startLinting(this);
-  });
-});
+  function show_summary(stats) {
+    var severities = ["error", "warning", "info"];
+    var box = document.getElementById("mwlint-stats-box");
+    if (!box) {
+      var toolbar = document.getElementById("wikiEditor-ui-toolbar");
+      if (!toolbar) { return };
+      var box = document.createElement('div');
+      box.setAttribute("id", "mwlint-stats-box")
+      toolbar.insertBefore(box, toolbar.getElementsByClassName("sections")[0]);
+      for (var i=0; i<severities.length; i++) {
+        var elem = document.createElement('span');
+        elem.setAttribute("id", "mwlint-stats-" + severities[i]);
+        elem.setAttribute("class", "mwlint-stat CodeMirror-lint-marker-" + severities[i]);
+        box.appendChild(elem);
+      }
+    }
+    for (var i=0; i<severities.length; i++) {
+      var severity = severities[i];
+      var elem = document.getElementById("mwlint-stats-" + severity);
+      if (elem) {
+        if (stats.hasOwnProperty(severity)) {
+          elem.textContent = stats[severity];
+        } else {
+          elem.textContent = "✓"
+        }
+      }
+    }
+  } 
+
+  function register_mfnf_extensions() {
+
+    // CodeMirror, copyright (c) by Marijn Haverbeke and others
+    // Distributed under an MIT license: http://codemirror.net/LICENSE
+    // Modified by Valentin Roland
+
+    (function(mod) {
+      mod(CodeMirror);
+    })(function(CodeMirror) {
+      "use strict";
+
+      function cmp_severity(a, b) {
+        var values = {
+          info: 10,
+          warning: 20,
+          error: 30
+        };
+        return values[b.severity] - values[a.severity];
+      }
+
+      CodeMirror.registerHelper("lint", "markdown", function(text, options) {
+        return new Promise(function(resolve, reject) {
+          var source = text.replace(/\n\r/g, "\n");
+          fetch_lints(source).then(function(lints) {
+            var found = [];
+			var lint_counts = {};
+            lints.sort(cmp_severity);
+            for (var i = 0; i < lints.length; i++) {
+              var lint = lints[i];
+              var severity = lint.severity;
+              var examples = get_examples(lint.kind);
+              var example_html = "";
+
+              if (!lint_counts[severity]) {
+                lint_counts[severity] = 0;
+              }
+      			  lint_counts[severity] = lint_counts[severity] + 1
+
+              for (var j = 0; j < examples.length; j++) {
+                var example = examples[j];
+                example_html = example_html + "<div class=\"example\">" +
+                  "<div class=\"example-bad-tag\">bad:</div>" +
+                  "<div class=\"example-bad\">" + example.bad + "</div>" +
+                  "<div class=\"example-bad-expl\">" + example.bad_explanation + "</div>" +
+                  "<div class=\"example-good-tag\">good:</div>" +
+
+                  "<div class=\"example-good\">" + example.good + "</div>" +
+                  "<div class=\"example-good-expl\">" + example.good_explanation + "</div>" +
+                  "</div>"
+              }
+
+              found.push({
+                from: CodeMirror.Pos(lint.position.start.line - 1, lint.position.start.col - 1),
+                to: CodeMirror.Pos(lint.position.end.line - 1, lint.position.end.col - 1),
+                messageHTML: "<div class=\"explanation explanation-" + lint.severity +
+                  "\">" + lint.explanation + "</div>" +
+                  "<div class=\"solution\">" + lint.solution + "</div>" +
+                  "<div class=\"explanation_long\">" + lint.explanation_long + "</div>" +
+				  "<hr class=\"example-sep\">" + 
+                  "<div class=\"example-container\">" +
+                  "<div class=\"example-header\">Examples:</div>" +
+                  example_html +
+                  "</div>",
+                severity: severity
+              });
+            }
+            show_summary(lint_counts);
+            resolve(found);
+          }, function() {
+            console.log("getting lints failed! Maybe wasm loading error?");
+            reject([]);
+          });
+        });
+      });
+    });
+  };
+}
