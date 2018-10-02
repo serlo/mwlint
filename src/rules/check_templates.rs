@@ -32,11 +32,18 @@ rule_impl!(CheckTemplates, "Checks for the correct use of templates."
     => LintKind::DeprecatedTemplateName
 ;
     deprecated_arg_name,
-    "{{greeting|greeting_to_user=Hello World}}",
-    "The argument `greeting_to_user` has been renamed to `greeting` \
+    "{{:Mathe für Nicht-Freaks: Vorlage:Gruppenaufgabe \
+      |teilaufgabe1=Was ist der Sinn des Lebens? \
+      |teilaufgabe1-solution=42 \
+    }}",
+    "The argument `teilaufgabe1-solution` has been renamed to `teilaufgabe1-lösung` \
+    for consistency. \
     The old name should not be used any more.`",
-    "{{greeting|greeting=Hello World}}",
-    "The template is called with the new argument name."
+    "{{:Mathe für Nicht-Freaks: Vorlage:Gruppenaufgabe \
+      |teilaufgabe1=Was ist der Sinn des Lebens? \
+      |teilaufgabe1-lösung=42 \
+    }}",
+    "The template is called with the new argument name `teilaufgabe1-lösung`."
     => LintKind::DeprecatedArgumentName
 ;
     missing_arg,
