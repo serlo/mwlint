@@ -12,22 +12,36 @@ function add_script(url) {
 };
 
 if (mw.config.get("wgPageName").startsWith("Mathe_für_Nicht-Freaks:") && document.getElementById("wpTextbox1") != null) {
-	var linter = add_script('https://mathe-builds.serlo.org/mwlint/mwlint_wasm.js').then(() => {
-		return window.wasm_bindgen('https://mathe-builds.serlo.org/mwlint/mwlint_wasm_bg.wasm');
-	});
-    add_script('https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/codemirror.min.js').then(() => {
+  var linter = add_script('https://mathe-builds.serlo.org/mwlint/mwlint_wasm.js').then(() => {
+    return window.wasm_bindgen('https://mathe-builds.serlo.org/mwlint/mwlint_wasm_bg.wasm');
+  });
+
+  function load_editor() {
     mw.loader.load('https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/codemirror.min.css', 'text/css');
-    
     var lint_addon = add_script('https://mathe-builds.serlo.org/mwlint/lint.js');
     var markdown = add_script('https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/mode/markdown/markdown.min.js');
     var brackets= add_script('https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/addon/edit/matchbrackets.min.js');
     var active_line = add_script('https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/addon/selection/active-line.min.js');
-    
-      Promise.all([lint_addon, markdown, brackets, active_line, linter]).then((values) => {
-		mwlint_examples = JSON.parse(window.wasm_bindgen.examples());
-		init_editor();
+
+    Promise.all([lint_addon, markdown, brackets, active_line, linter]).then((values) => {
+      // remove syntax highlight tool
+      $( '#wpTextbox1' ).wikiEditor( 'removeFromToolbar', {
+        'section': 'main',
+        'group': 'codemirror',
       });
-  });
+      mwlint_examples = JSON.parse(window.wasm_bindgen.examples());
+      init_editor();
+    });
+  }
+
+  if (CodeMirror != undefined) {
+    load_editor()
+  } else  {
+    mw.loader.load('https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/codemirror.min.css', 'text/css');
+    add_script('https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/codemirror.min.js').then(() => {
+      load_editor();
+    });
+  }
 };
 
 function init_editor() {
@@ -188,7 +202,7 @@ function init_editor() {
           var source = text.replace(/\n\r/g, "\n");
           fetch_lints(source).then(function(lints) {
             var found = [];
-			var lint_counts = {};
+      var lint_counts = {};
             lints.sort(cmp_severity);
             for (var i = 0; i < lints.length; i++) {
               var lint = lints[i];
@@ -199,7 +213,7 @@ function init_editor() {
               if (!lint_counts[severity]) {
                 lint_counts[severity] = 0;
               }
-      			  lint_counts[severity] = lint_counts[severity] + 1
+              lint_counts[severity] = lint_counts[severity] + 1
 
               for (var j = 0; j < examples.length; j++) {
                 var example = examples[j];
@@ -221,7 +235,7 @@ function init_editor() {
                   "\">" + lint.explanation + "</div>" +
                   "<div class=\"solution\">" + lint.solution + "</div>" +
                   "<div class=\"explanation_long\">" + lint.explanation_long + "</div>" +
-				  "<hr class=\"example-sep\">" + 
+          "<hr class=\"example-sep\">" + 
                   "<div class=\"example-container\">" +
                   "<div class=\"example-header\">Examples:</div>" +
                   example_html +
