@@ -12,12 +12,12 @@ doc = false
 web = []
 
 [dependencies]
-mediawiki_parser = "0.3"
+mediawiki_parser = "0.4"
 mwparser_utils = { git = "https://github.com/vroland/mediawiki-parser-utils.git" }
 mfnf_template_spec = { git = "https://github.com/vroland/mfnf-template-spec.git" }
 serde = "1.0"
 serde_derive = "1.0"
-serde_yaml = "0.7"
+serde_yaml = "0.8"
 colored = "1.6"
 structopt = "0.2"
 
