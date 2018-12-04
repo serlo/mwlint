@@ -177,7 +177,7 @@ fn illegal_content(
              fulfill the following property: `{}`",
             predicate_text
         ),
-        solution: "Take a look at the template documentation below or contact
+        solution: "Take a look at the template documentation below or contact \
                    the main authors to ask for help."
             .into(),
         severity: Severity::Error,

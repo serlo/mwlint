@@ -1,4 +1,5 @@
 extern crate mediawiki_parser;
+extern crate serde_json;
 extern crate serde_yaml;
 #[macro_use]
 extern crate structopt;
@@ -18,8 +19,7 @@ use structopt::StructOpt;
 #[derive(Debug, StructOpt)]
 #[structopt(
     name = "mwlint",
-    about = "This program \
-             takes a yaml syntax tree of a mediawiki document \
+    about = "Takes the syntax tree of a mediawiki document \
              (as created by `mwtoast`) as input and checks it for for discouraged \
              patterns and other nitpicks."
 )]
@@ -77,9 +77,9 @@ fn main() -> Result<(), std::io::Error> {
 
     let mut root = if let Some(path) = args.input_file {
         let file = fs::File::open(&path)?;
-        serde_yaml::from_reader(&file)
+        serde_json::from_reader(&file)
     } else {
-        serde_yaml::from_reader(io::stdin())
+        serde_json::from_reader(io::stdin())
     }.expect("Error reading input:");
 
     root = normalize(root, &settings).expect("Input normalization error:");
@@ -104,7 +104,7 @@ fn main() -> Result<(), std::io::Error> {
 
     println!(
         "{}",
-        &serde_yaml::to_string(&lints).expect("could not serialize lints:")
+        &serde_json::to_string(&lints).expect("could not serialize lints:")
     );
     Ok(())
 }
