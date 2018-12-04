@@ -1,7 +1,7 @@
+use crate::preamble::*;
 #[cfg(feature = "web")]
 use mfnf_template_spec::markdown;
 use mfnf_template_spec::{is_plain_text, parse_template, spec_meta, spec_of};
-use preamble::*;
 
 rule_impl!(CheckTemplates, "Checks for the correct use of templates."
 => examples:
@@ -140,10 +140,7 @@ fn deprecated_name(
 fn missing_argument(position: &Span, name: &str) -> Lint {
     Lint {
         position: position.clone(),
-        explanation: format!(
-            "The template argument `{}` is missing but required!",
-            name
-        ),
+        explanation: format!("The template argument `{}` is missing but required!", name),
         explanation_long: "This template has arguments to tell it what to do. These can be \
                            given by named parameters like `{{name|argument_name=value}}`) and \
                            by unnamed parameters as in `{{name|value}}`. Unnamed arguments \
@@ -152,8 +149,7 @@ fn missing_argument(position: &Span, name: &str) -> Lint {
                            {{name|1=value}} \n\
                            <!-- is equal to --> \n\
                            {{name|value}} \n\
-                           ```"
-            .into(),
+                           ```".into(),
         solution: format!(
             "Add a value for the argument `{}`. (Also note the template documentation below)",
             name

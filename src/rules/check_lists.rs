@@ -1,4 +1,4 @@
-use preamble::*;
+use crate::preamble::*;
 
 rule_impl!(CheckLists, "Checks for malformed lists"
 => examples:

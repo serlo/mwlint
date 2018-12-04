@@ -1,4 +1,4 @@
-use preamble::*;
+use crate::preamble::*;
 
 rule_impl!(CheckHeadings, "Checks for erroneous headings."
 => examples:

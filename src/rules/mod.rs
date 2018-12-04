@@ -1,5 +1,5 @@
-use lint::{Example, LintKind};
-use rule::*;
+use crate::lint::{Example, LintKind};
+use crate::rule::*;
 
 mod check_formulas;
 mod check_headings;

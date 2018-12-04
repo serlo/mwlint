@@ -1,6 +1,6 @@
-use lint::{Example, Lint};
+use crate::lint::{Example, Lint};
+use crate::preamble::*;
 use mwparser_utils::TexResult;
-use preamble::*;
 
 rule_impl!(CheckFormulas, "Verify math formulas."
 => examples:

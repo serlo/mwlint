@@ -1,5 +1,5 @@
-use lint::{Example, Lint};
-use preamble::*;
+use crate::lint::{Example, Lint};
+use crate::preamble::*;
 
 rule_impl!(CheckHtml, "Hints for text elements."
 => examples:

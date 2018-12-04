@@ -1,6 +1,6 @@
-use lint::*;
+use crate::lint::*;
+use crate::settings::{RuleMeta, Settings};
 use mediawiki_parser::*;
-use settings::{RuleMeta, Settings};
 use std::io;
 
 /// Linter rule trait.
