@@ -145,7 +145,7 @@ function init_editor() {
     mode: {
       name: "markdown"
     },
-    viewportMargin: Infinity,
+    //viewportMargin: Infinity,
   });
 
   function show_summary(stats) {

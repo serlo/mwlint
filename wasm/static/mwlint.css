@@ -1,3 +1,8 @@
+.wikiEditor-ui .CodeMirror {
+    height: 40em;
+    resize: vertical;
+}
+
 .lint {
     border: 1px;
     border-style: solid;
