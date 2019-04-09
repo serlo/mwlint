@@ -34,7 +34,7 @@ if (mw.config.get("wgPageName").startsWith("Mathe_für_Nicht-Freaks:") && docume
     });
   }
 
-  if (CodeMirror != undefined) {
+  if (typeof CodeMirror !== 'undefined') {
     load_editor()
   } else  {
     mw.loader.load('https://tools-static.wmflabs.org/cdnjs/ajax/libs/codemirror/5.34.0/codemirror.min.css', 'text/css');
