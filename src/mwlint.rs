@@ -64,7 +64,7 @@ fn main() -> Result<(), std::io::Error> {
     if args.dump_template_docs {
         println!("# Template Documentation\n");
         for template in &settings.template_spec {
-            println!("{}\n", markdown::template_description(&template, 1));
+            println!("{:?}\n", markdown::template_description(&template, 1));
         }
         process::exit(0);
     }
@@ -80,7 +80,8 @@ fn main() -> Result<(), std::io::Error> {
         serde_json::from_reader(&file)
     } else {
         serde_json::from_reader(io::stdin())
-    }.expect("Error reading input:");
+    }
+    .expect("Error reading input:");
 
     root = normalize(root, &settings).expect("Input normalization error:");
 
